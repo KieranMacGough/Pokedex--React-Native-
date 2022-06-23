@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const tslib_1 = require("tslib");
+tslib_1.__exportStar(require("./ability"), exports);
+tslib_1.__exportStar(require("./characteristics"), exports);
+tslib_1.__exportStar(require("./egg-group"), exports);
+tslib_1.__exportStar(require("./gender"), exports);
+tslib_1.__exportStar(require("./growth-rates"), exports);
+tslib_1.__exportStar(require("./nature"), exports);
+tslib_1.__exportStar(require("./pokeathlon-stat"), exports);
+tslib_1.__exportStar(require("./stats"), exports);
+tslib_1.__exportStar(require("./type"), exports);
+tslib_1.__exportStar(require("./pokemon"), exports);
