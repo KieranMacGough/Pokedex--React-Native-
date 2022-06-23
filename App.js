@@ -1,13 +1,17 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+// import { StatusBar } from 'expo-status-bar';
+import { StatusBar, StyleSheet, Text, View } from 'react-native';
+import globalStyles from './styles/globalStyles.js';
+import Home from './components/Home.js';
 
 export default function App() {
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+    <>
+        <View style={styles.container}>
+          <Home />
+        </View>
+    </>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -15,6 +19,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+    justifyContent: 'flex-start',
+    paddingTop: StatusBar.currentHeight 
+  }
+})
