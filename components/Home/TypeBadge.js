@@ -1,6 +1,6 @@
 import React from 'react';
 import {  StyleSheet, View, Image, Text } from "react-native";
-import globalStyles from '../styles/globalStyles.js';
+import globalStyles from '../../styles/globalStyles.js';
 
 export default function TypeBadge(props) {
 return (

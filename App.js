@@ -1,7 +1,7 @@
 // import { StatusBar } from 'expo-status-bar';
 import { StatusBar, StyleSheet, Text, View } from 'react-native';
 import globalStyles from './styles/globalStyles.js';
-import Home from './components/Home.js';
+import Home from './components/Home/Home.js';
 
 export default function App() {
 
@@ -16,10 +16,9 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingTop: StatusBar.currentHeight 
+    paddingTop: StatusBar.currentHeight,
   }
 })

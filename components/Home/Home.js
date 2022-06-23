@@ -1,12 +1,12 @@
 import React, { useState, useEffect, startTransition } from 'react';
 import { StatusBar, Image, ScrollView, View, TextInput, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import PokeballTop from '../images/vectors/patterns/PokeballTop.png';
+import PokeballTop from '../../images/vectors/patterns/PokeballTop.png';
 
 import { MainClient } from 'pokenode-ts';
 import Navbar from './Navbar.js';
 import SearchBar from './SearchBar.js';
 import List from './List.js';
-import globalStyles from '../styles/globalStyles.js';
+import globalStyles from '../../styles/globalStyles.js';
 
 const Home = () => {
     const [searchPhrase, setSearchPhrase] = useState("");
@@ -22,7 +22,7 @@ const Home = () => {
                 .listPokemons(1,5)
                 .then((data) => {
                     const getAllPokemonData = async () => {                  
-                        for (let i = 1; i < 7; i++){
+                        for (let i = 1; i < 800; i++){
                             await api.pokemon
                                 .getPokemonById(i)
                                 .then((data) => {
@@ -59,7 +59,7 @@ const Home = () => {
                             clicked={clicked}
                             setClicked={setClicked}
                         />
-                        <List
+                        <List 
                             searchPhrase={searchPhrase}
                             data={allPokemonData}
                             setClicked={setClicked}
@@ -83,7 +83,6 @@ const styles = StyleSheet.create({
     container: {
         padding: 0,
         margin: 0,
-       
     },
 
     Home: {
