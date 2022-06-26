@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Image, Text} from "react-native";
+import { StyleSheet, View, Image, Text, TouchableOpacity} from "react-native";
 import globalStyles from '../../styles/globalStyles.js';
 import TypeBadge from './TypeBadge';
 import Pokeball from '../../images/vectors/patterns/Pokeball.png';
@@ -7,7 +7,6 @@ import DotsSixByThree from '../../images/vectors/patterns/6x3.png';
 
 
 export default function Pokemon(props) {
- //   console.log(props.mon.name);
     function formatId(id) {
         var num = '' + id;
         while (num.length < 3){
@@ -18,12 +17,12 @@ export default function Pokemon(props) {
     }
     return (
     //    console.log(props.sprites.other["official-artwork"].front_default),
+    <TouchableOpacity onPress={() => props.setPokemonProfile(props.mon)}>
         <View style={styles.container}>
           <View style={[styles.card, {backgroundColor: globalStyles["backgroundtype"+props.mon.types[0].type.name]}]}>
                 <Image style={styles.pokeball} source={Pokeball}/>
                 <Image style={styles.dotsSixByThree} source={DotsSixByThree} />           
                 <Image onError={(e) => console.log(e.nativeEvent.error) } style={styles.sprite} source={{uri:`${props.mon.sprites.other["official-artwork"].front_default}`}} />
-                {/* <Image source="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png" /> */}
             <View style={styles.cardData}>
                 <Text style={styles.cardId}>{formatId(props.mon.id)}</Text>
                 <Text style={styles.cardName}>{props.mon.name}</Text>
@@ -36,6 +35,7 @@ export default function Pokemon(props) {
             </View>
             </View>
         </View>
+      </TouchableOpacity>
     )
 }
 
@@ -59,16 +59,24 @@ const styles = StyleSheet.create({
       position: 'absolute',
       right: 0,
       bottom: 0,
+      height: 115,
+      width: 130
     },
 
     dotsSixByThree: {
       position: 'absolute',
       top: 5,
       left: 90,
+      height: 32,
+      width: 74
     },
 
     sprite: {
-      height: 500
+      position: 'absolute',
+      right: 10,
+      bottom: 10,
+      height: 130,
+      width: 130
     },
     
     cardData: {

@@ -1,17 +1,19 @@
 import React, { useState, useEffect, startTransition } from 'react';
-import { StatusBar, Image, ScrollView, View, TextInput, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { StatusBar, Image, View, TextInput, Text, StyleSheet, ActivityIndicator, Dimensions } from 'react-native';
 import PokeballTop from '../../images/vectors/patterns/PokeballTop.png';
 
 import { MainClient } from 'pokenode-ts';
 import Navbar from './Navbar.js';
 import SearchBar from './SearchBar.js';
 import List from './List.js';
+import Options from './Options.js';
 import globalStyles from '../../styles/globalStyles.js';
 
-const Home = () => {
+const Home = (props) => {
     const [searchPhrase, setSearchPhrase] = useState("");
     const [clicked, setClicked] = useState(false);
     const [allPokemonData, setAllPokemonData] = useState([]);
+    const [homeOption, setHomeOption] = useState('');
 
 // get data from the fake api endpoint
     useEffect(() => {
@@ -22,7 +24,7 @@ const Home = () => {
                 .listPokemons(1,5)
                 .then((data) => {
                     const getAllPokemonData = async () => {                  
-                        for (let i = 1; i < 800; i++){
+                        for (let i = 1; i < 30; i++){
                             await api.pokemon
                                 .getPokemonById(i)
                                 .then((data) => {
@@ -40,13 +42,19 @@ const Home = () => {
         getAllPokemonNames();
         // console.log({allPokemonData});
     }, []);
-   
+
+    useEffect(() => {
+        console.log("Home option is now %s", homeOption);
+    }, [homeOption]);
     return (
+        <>
+        <Image style={styles.pokeballTop} source={PokeballTop} />
         <View style={styles.container}>
-            <Image style={styles.pokeballTop} source={PokeballTop} />
             <View style={styles.Home}> 
-            <Navbar />
                 <View>
+                    <View>
+                     <Navbar style={styles.Navbar} setHomeOption={setHomeOption} />
+                    </View>
                     <View style={styles.title}>
                         <Text style={styles.titleText}>Pokédex</Text>
                         <Text style={styles.titleDescription}>Search for Pokémon by name or using the National Pokédex number.</Text>
@@ -61,13 +69,19 @@ const Home = () => {
                         />
                         <List 
                             searchPhrase={searchPhrase}
+                            setSearchPhrase={setSearchPhrase}
                             data={allPokemonData}
                             setClicked={setClicked}
+                            setPokemonProfile={props.setPokemonProfile}
+                            allPokemonData={allPokemonData}
                         />
+                        {/* <Options /> */}
                     </View>
                 </View>
+
             </View>
         </View>
+        </>
 
     );
 };
@@ -85,6 +99,17 @@ const styles = StyleSheet.create({
         margin: 0,
     },
 
+    Navbar: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        marginTop: 2.5,
+        marginRight: 2.5,
+        marginBottom: 37.5,
+        height: 30,
+      },
+
     Home: {
       display: 'flex',
       flexDirection: 'column',
@@ -94,15 +119,15 @@ const styles = StyleSheet.create({
 
     pokeballTop: {
         position: 'absolute',
-        width: '100%',
-        overflow: 'visible',
-        top: 0,
-        margin: 0,
-        padding: 0
+        top: StatusBar.currentHeight,
+        left: 0,
+        width: Dimensions.get('window').width,
+        height: Math.round(Dimensions.get('window').width) * (207 / 414),
     },
 
     title: {
       margin: 0,
+      padding: 0
     },
     
     titleText: {

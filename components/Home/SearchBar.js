@@ -17,9 +17,9 @@ const SearchBar = ({clicked, searchPhrase, setSearchPhrase, setClicked}) => {
         {/* search Icon */}
         <Feather
           name="search"
-          size={20}
+          size={25}
           color="black"
-          style={{ marginLeft: 1 }}
+          style={{ marginLeft: 10 }}
         />
         {/* Input field */}
         <TextInput
@@ -33,7 +33,7 @@ const SearchBar = ({clicked, searchPhrase, setSearchPhrase, setClicked}) => {
         />
         {/* cross Icon, depending on whether the search bar is clicked or not */}
         {clicked && (
-          <Entypo name="cross" size={20} color="black" style={{ padding: 1 }} onPress={() => {
+          <Entypo name="cross" size={25} color="black" style={styles.x} onPress={() => {
               setSearchPhrase("")
           }}/>
         )}
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
 
   },
   searchBar__unclicked: {
-    paddingLeft: 55,
+    paddingLeft: 25,
     paddingRight: 25,
     paddingVertical: 20.5,
     flexDirection: "row",
@@ -63,10 +63,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "space-evenly",
-    fontSize: '2px',
+    fontSize: 16,
   },
   searchBar__clicked: {
-    paddingLeft: 55,
+    paddingLeft: 25,
     paddingRight: 25,
     paddingVertical: 20.5,
     flexDirection: "row",
@@ -75,11 +75,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "space-evenly",
-    fontSize: 16
+    fontSize: 16,
   },
   input: {
     fontSize: 16,
-    marginLeft: 20,
+    marginLeft: 30,
     width: '100%'
-  },
+  }, 
+
+  x: {
+    marginRight: 10
+  }
 });
