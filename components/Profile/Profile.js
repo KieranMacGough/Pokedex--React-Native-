@@ -1,5 +1,5 @@
 import React, { useState, useEffect, startTransition } from 'react';
-import { TouchableOpacity, Dimensions, StatusBar, Image, View, TextInput, Text, StyleSheet, ActivityIndicator, BackHandler } from 'react-native';
+import { TouchableOpacity, ScrollView, Dimensions, StatusBar, Image, View, TextInput, Text, StyleSheet, ActivityIndicator, BackHandler } from 'react-native';
 import PokeballTop from '../../images/vectors/patterns/PokeballTop.png';
 import TypeBadge from '../Home/TypeBadge';
 import globalStyles from '../../styles/globalStyles.js';
@@ -8,11 +8,61 @@ import Pokeball from '../../images/vectors/patterns/PokeballTab.png';
 import DotsSixByThree from '../../images/vectors/patterns/6x3.png';
 import Circle from '../../images/vectors/patterns/Circle.png';
 import Back from '../../images/vectors/icons/Back.png';
+import { Languages, MainClient } from 'pokenode-ts';
+import StatsTable from './StatsTable';
+import DataLine from './DataLine';
+import Tab from './Tab';
 
 const Profile = (props) => {
     const [tab, setTab] = useState("About");
+    const [pokemonSpeciesData, setPokemonSpeciesData] = useState([]);
+    const [species, setSpecies] = useState('Unknown');
+    const [weight, setWeight] = useState('Unknown');
+    const [height, setHeight] = useState('Unknown');
+    const [growthRate, setGrowthRate] = useState('Unknown');
+    const [catchRate, setCatchRate] = useState('Unknown');
+    const [eggCycles, setEggCycles] = useState('Unknown');
+    const [pokedexEntry, setPokedexEntry] = useState('Unknown');
+    const [eggGroups, setEggGroups] = useState([]);
 
-    console.log(props.mon);
+
+    function cmToFtInches(num) {
+        const realFeet = ((num*0.393700) / 12);
+        const feet = Math.floor(realFeet);
+        let inches = (Math.round(10*((realFeet - feet) * 12)) / 10).toFixed(0);
+        inches = inches.toString().padStart(2, '0');
+        return feet+"\'"+inches+"\""
+    }
+
+    useEffect(() => {
+      const getPokemonSpeciesData = async () => {
+        setWeight(props.mon.weight/10+'kg ('+(props.mon.weight/10*2.20462).toFixed(1)+' lbs)')
+        setHeight(props.mon.height/10+'m ('+cmToFtInches(props.mon.height*10)+')')
+        const api = new MainClient();
+        await api.pokemon
+            .getPokemonSpeciesById(props.mon.id)
+            .then((data) => {
+              setPokemonSpeciesData(data);
+              setGrowthRate(data.growth_rate.name.replace(/\-/g, " "));
+              setCatchRate(data.capture_rate);
+              setEggCycles(data.hatch_counter+' ('+(data.hatch_counter*255).toLocaleString('en-US')+'-'+(data.hatch_counter*257).toLocaleString('en-US')+' steps)');
+              setPokedexEntry(data.flavor_text_entries[0].flavor_text.replace(/[\n\f]/g,' '));
+              for (let i = 0; i < data.genera.length; i++) {
+                if (data.genera[i].language.name === 'en'){
+                  setSpecies(data.genera[i].genus);
+                }                
+              }
+
+              setEggGroups(data.egg_groups.map(x => (x.name)))
+            })
+      } 
+      getPokemonSpeciesData()
+    },[]);
+    // console.log(props);
+    // console.log(pokemonSpeciesData);
+    // console.log(growthRate);
+    // console.log(pokedexEntry);
+    // console.log(props.mon);
     function formatId(id) {
         var num = '' + id;
         while (num.length < 3){
@@ -25,7 +75,7 @@ const Profile = (props) => {
 
     
     return (
-        <View style={[styles.container, {backgroundColor: globalStyles["backgroundtype"+props.mon.types[0].type.name]}]}>
+        <ScrollView style={[styles.container, {backgroundColor: globalStyles["backgroundtype"+props.mon.types[0].type.name]}]}>
             <TouchableOpacity style={styles.backArrowTouchable} activeOpacity = { .8 } onPress={() => (props.setPokemonProfile(''))}>
                 <Image style={styles.backArrow} source={Back}/>
             </TouchableOpacity>
@@ -52,48 +102,60 @@ const Profile = (props) => {
                     </View>
                 </View>  
                 <View style={styles.tabs}>
-                    
-                    <TouchableOpacity activeOpacity = { .8 } onPress={() => (setTab("About"))}>
-                    <View style={styles.tab}>
-                        {tab === "About"
-                            ?  <><Image style={styles.tabPokeball} source={Pokeball} />
-                                 <Text style={styles.tabActive}>About</Text></>
-                            :  <Text style={styles.tabInactive}>About</Text>
-                        }
-                          </View>
-                    </TouchableOpacity>
-                  
-
-                    <TouchableOpacity activeOpacity = { .8 } onPress={() => (setTab("Stats"))}>
-                        <View style={styles.tab}>
-                    {tab === "Stats"
-                            ?      <><Image style={styles.tabPokeball} source={Pokeball} />
-                                 <Text style={styles.tabActive}>Stats</Text></>
-                            :  <Text style={styles.tabInactive}>Stats</Text>
-                        }
-                        </View>
-                    </TouchableOpacity>
-           
-                    
-                    <TouchableOpacity activeOpacity = { .8 } onPress={() => (setTab("Evolution"))}>
-                    <View style={styles.tab}>
-                    {tab === "Evolution"
-                    
-                            ?  <><Image style={styles.tabPokeball} source={Pokeball} />
-                            <Text style={styles.tabActive}>Evolution</Text></>
-                            :  <Text style={styles.tabInactive}>Evolution</Text>
-                        }
-                        </View>
-                    </TouchableOpacity>
+                    <Tab tab={tab} setTab={setTab} name="About" />
+                    <Tab tab={tab} setTab={setTab} name="Stats" />
+                    <Tab tab={tab} setTab={setTab} name="Evolution" />
                 </View>
 
             </View>
             <View style={styles.box}>
-                <View style={styles.boxContent}>
-                    <Text style={styles.aboutDesc}>I AM A BOX!</Text>
-                </View>
+                    {tab === "About" &&  
+                        <View style={styles.boxContent}>
+                        <Text style={styles.boxPokedexEntry}>{pokedexEntry}</Text>
+
+                            <Text style={[styles.boxTitle, {color: globalStyles["type"+props.mon.types[0].type.name]}]}>Pokédex Data</Text> 
+                              <DataLine tag={"Species"} data={species} />
+                              <DataLine tag={"Height"} data={height} />
+                              <DataLine tag={"Weight"} data={weight} />
+                              <DataLine tag={"Abilities"} data={''} />
+                              <DataLine tag={"Weaknesses"} data={''} />
+
+                            <Text style={[styles.boxTitle, {color: globalStyles["type"+props.mon.types[0].type.name]}]}>Training</Text> 
+                              <DataLine tag={"EV Yield"} data={''} />
+                              <DataLine tag={"Catch Rate"} data={catchRate} />
+                              <DataLine tag={"Base Friendship"} data={pokemonSpeciesData.base_happiness} />
+                              <DataLine tag={"Base Exp"} data={props.mon.base_experience} />
+                              <DataLine tag={"Growth Rate"} data={growthRate} />
+
+                            <Text style={[styles.boxTitle, {color: globalStyles["type"+props.mon.types[0].type.name]}]}>Breeding</Text> 
+                             <DataLine tag={"Egg Groups"} data={eggGroups.join(", ")} />
+                             <DataLine tag={"Egg Cycles"} data={eggCycles} />
+
+                            <Text style={[styles.boxTitle, {color: globalStyles["type"+props.mon.types[0].type.name]}]}>Location</Text> 
+                            <View style={{height:10}}></View>
+                        </View>
+                    }
+                    {tab === "Stats" &&  
+                        <View style={styles.boxContent}>
+                            <Text style={[styles.boxTitle, {color: globalStyles["type"+props.mon.types[0].type.name]}]}>Base Stats</Text>
+                            <View style={styles.statGrid}>
+                              <StatsTable stats={props.mon.stats} type={props.mon.types[0].type.name} />
+                            </View>
+                            <Text style={styles.statsExplained}>The ranges shown on the right are for a level 100 Pokémon. Maximum values are based on a beneficial nature, 252 EVs, 31 IVs; minimum values are based on a hindering nature, 0 EVs, 0 IVs</Text>
+                            <Text style={[styles.boxTitle, {color: globalStyles["type"+props.mon.types[0].type.name]}]}>Type Defences</Text>
+                            <View style={{height:10}}></View>
+                        </View>
+                    }
+                    {tab === "Evolution" &&  
+                        <View style={styles.boxContent}>
+                            <Text style={[styles.boxTitle, {color: globalStyles["type"+props.mon.types[0].type.name]}]}>Evolution Chart</Text>
+                            <View style={{height:10}}></View>
+                        </View>
+                    }
+                     
             </View>
-        </View>
+           
+        </ScrollView>
     );
 };
 
@@ -118,8 +180,10 @@ const styles = StyleSheet.create({
         top: 42.5,
         left: 42.5,
         height: 20,
-        width: 20
+        width: 20,
+        zIndex: 1
     },
+
     backArrow: {
         height: 20,
         width: 20
@@ -127,7 +191,7 @@ const styles = StyleSheet.create({
 
     pokemonTitleContainer: {
         position: 'absolute',
-        top: 50,
+        top: 15,
         left:0,
         height: 120,
         width: Dimensions.get('window').width,
@@ -143,31 +207,19 @@ const styles = StyleSheet.create({
         fontFamily: 'Outline'
     },
 
-    Navbar: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        marginTop: 2.5,
-        marginRight: 2.5,
-        marginBottom: 37.5,
-        height: 30,
-      },
-
     Profile: {
       display: 'flex',
       flexDirection: 'column',
-
       marginHorizontal: 40,
-      marginTop: 110
+      marginTop: 55
     },
     
     top: {
         display: 'flex',
         flexDirection: 'row',
         height: 155,
-        width: 'auto',
         padding: 0,
+        justifyContent: 'center'
     },
 
     topImage: {
@@ -182,16 +234,15 @@ const styles = StyleSheet.create({
         left:0,
         height: 125,
         width: 125,
-
       },
   
-      dotsSixByThree: {
-        position: 'absolute',
-        top: 5,
-        left: 90,
-        height: 32,
-        width: 74
-      },
+    //   dotsSixByThree: {
+    //     position: 'absolute',
+    //     top: 5,
+    //     left: 90,
+    //     height: 32,
+    //     width: 74
+    //   },
   
       sprite: {
         position: 'absolute',
@@ -200,34 +251,6 @@ const styles = StyleSheet.create({
         height: 125,
         width: 125
       },
-
-    pokeballTop: {
-        position: 'absolute',
-        top: StatusBar.currentHeight,
-        left: 0,
-        width: Dimensions.get('window').width,
-        height: Math.round(Dimensions.get('window').width) * (207 / 414),
-    },
-
-    title: {
-      margin: 0,
-      padding: 0
-    },
-    
-    titleText: {
-        fontWeight: '700',
-        fontSize: 32,
-        color: globalStyles.textblack,
-        margin: 0,
-        marginBottom: 10,
-    },
-    
-    titleDescription: {
-      fontWeight: '400',
-      fontSize: 16,
-      color: globalStyles.textgrey,
-      margin: 0,
-    },
 
     cardData: {
         display: 'flex',
@@ -255,14 +278,6 @@ const styles = StyleSheet.create({
         color: globalStyles.textwhite
       },
       
-      cardImg: {
-        position: 'absolute',
-        right: 10,
-        bottom: 25,
-        height: 130,
-        width: 130,
-      },  
-
       tabs: {
         display: 'flex',
         flexDirection: 'row',
@@ -270,34 +285,9 @@ const styles = StyleSheet.create({
         margin: 0,
         alignItems: 'center',
       },
-      tab:{
-        display: 'flex',
-        alignItems: 'center',
-        height: 50,
-        width: 50
-      },
 
-      tabActive: {
-        color: globalStyles.textwhite,
-        fontSize: 16,
-        fontWeight: '700',
-        paddingTop: 16
-      },
-
-      tabInactive: {
-        color: globalStyles.textwhite,
-        fontSize: 16,
-        fontWeight: '400',
-        paddingTop: 16
-      },
-
-      tabPokeball: {
-        position: 'absolute',
-        height: 100,
-        width: 100
-      },
       box: {
-        height: 400,
+        flexGrow: 1,
         backgroundColor:  globalStyles.backgroundwhite,
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30
@@ -305,6 +295,59 @@ const styles = StyleSheet.create({
 
       boxContent: {
         marginHorizontal: 40,
-        marginTop: 40
-      }
+        marginTop: 40,
+        flexGrow:0
+      },
+
+      boxTitle: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: globalStyles.typenormal,
+        marginBottom: 22.5
+      },
+
+      boxPokedexEntry: {
+        fontSize: 16,
+        fontWeight: '400',
+        color: globalStyles.textgrey,
+        marginBottom: 30,
+      },
+
+      boxAbout: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 15,
+      },
+
+      boxAboutTagContainer: {
+        width: 85
+      },
+      boxAboutTag: {
+        fontSize: 12,
+        fontWeight: '500',
+        color: globalStyles.textblack,
+      },
+
+      boxAboutData: {
+        fontSize: 16,
+        fontWeight: '400',
+        color: globalStyles.textgrey,
+        textTransform: 'capitalize',
+      },
+
+      statsExplained: {
+        fontWeight: '500',
+        fontSize: 12,
+        marginBottom: 20,
+        color: globalStyles.textgrey
+      },
+
+      statGrid: {
+        display: 'flex',
+        flexDirection: 'row',
+        flex: 1,
+        alignSelf: 'stretch',
+      },
+     
   })
