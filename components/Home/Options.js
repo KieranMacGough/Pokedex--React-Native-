@@ -1,16 +1,38 @@
 import React from "react";
-import { Text, View, Dimensions, Animated } from "react-native";
+import { ScrollView, Text, View, Dimensions, Animated } from "react-native";
 
 // import SlidingUpPanel from "rn-sliding-up-panel";
 
-const { height } = Dimensions.get("window");
+
+
+const Options = (props) => {
+  const screenHeight = Dimensions.get("window").height;
+  const screenWidth = Dimensions.get("window").width;
+
+  return (
+    <ScrollView scrollEnabled={true} style={[styles.scrollView, {height: screenHeight*3, width: screenWidth}]}>
+      <View  style={styles.container}>
+        <Text>Hello world, I am {props.homeOption}</Text>
+      </View>
+    </ScrollView>
+  )
+}
+
+export default Options;
 
 const styles = {
+  scrollView: {
+    position: 'absolute',
+    top: 500,
+    left: 0,
+    backgroundColor: 'red'
+  },
+
   container: {
     flex: 1,
     backgroundColor: "#f8f9fa",
-    alignItems: "center",
-    justifyContent: "center"
+    backgroundColor: 'red',
+
   },
   panel: {
     flex: 1,
@@ -48,89 +70,3 @@ const styles = {
     zIndex: 1
   }
 };
-
-class Options extends React.Component {
-  static defaultProps = {
-    draggableRange: { top: height + 180 - 64, bottom: 180 }
-  };
-
-  _draggedValue = new Animated.Value(180);
-
-  render() {
-    const { top, bottom } = this.props.draggableRange;
-
-    const backgoundOpacity = this._draggedValue.interpolate({
-      inputRange: [height - 48, height],
-      outputRange: [1, 0],
-      extrapolate: "clamp"
-    });
-
-    const iconTranslateY = this._draggedValue.interpolate({
-      inputRange: [height - 56, height, top],
-      outputRange: [0, 56, 180 - 32],
-      extrapolate: "clamp"
-    });
-
-    const textTranslateY = this._draggedValue.interpolate({
-      inputRange: [bottom, top],
-      outputRange: [0, 8],
-      extrapolate: "clamp"
-    });
-
-    const textTranslateX = this._draggedValue.interpolate({
-      inputRange: [bottom, top],
-      outputRange: [0, -112],
-      extrapolate: "clamp"
-    });
-
-    const textScale = this._draggedValue.interpolate({
-      inputRange: [bottom, top],
-      outputRange: [1, 0.7],
-      extrapolate: "clamp"
-    });
-
-    return (
-      <View style={styles.container}>
-        <Text onPress={() => this._panel.show(360)}>Show panel</Text>
-        <SlidingUpPanel
-          ref={c => (this._panel = c)}
-          draggableRange={this.props.draggableRange}
-          animatedValue={this._draggedValue}
-          snappingPoints={[360]}
-          height={height + 180}
-          friction={0.5}
-        >
-          <View style={styles.panel}>
-            <Animated.View
-              style={[
-                styles.iconBg,
-                {
-                  opacity: backgoundOpacity,
-                  transform: [{ translateY: iconTranslateY }]
-                }
-              ]}
-            />
-            <View style={styles.panelHeader}>
-              <Animated.View
-                style={{
-                  transform: [
-                    { translateY: textTranslateY },
-                    { translateX: textTranslateX },
-                    { scale: textScale }
-                  ]
-                }}
-              >
-                <Text style={styles.textHeader}>-----------------</Text>
-              </Animated.View>
-            </View>
-            <View style={styles.container}>
-              <Text>Bottom sheet content</Text>
-            </View>
-          </View>
-        </SlidingUpPanel>
-      </View>
-    );
-  }
-}
-
-export default Options;

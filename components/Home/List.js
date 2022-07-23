@@ -48,6 +48,9 @@ const List = ({ searchPhrase, setClicked, data, setPokemonProfile, setSearchPhra
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           style={{paddingBottom: 540}}
+          initialNumToRender={20}
+          maxToRenderPerBatch={20}
+          removeClippedSubviews={true}
         />
       </View>
     </SafeAreaView>

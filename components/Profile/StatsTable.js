@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-
 import globalStyles from '../../styles/globalStyles.js';
 
 const StatsTable = (props) => {
@@ -31,12 +30,12 @@ const StatsTable = (props) => {
     function calcStatBarWidth(name, value ){
         switch(name){
             case 'hp': return ((value/255)*100)+'%';
-            case 'attack': return (value/181)*100;
-            case 'defense': return (value/230)*100;
-            case 'special-attack': return (value/180)*100;
-            case 'special-defense': return (value/230)*100;
-            case 'speed': return (value/200)*100;
-            case 'total': return ((value-175)/720)*100;
+            case 'attack': return ((value/181)*100)+'%';
+            case 'defense': return ((value/230)*100)+'%';
+            case 'special-attack': return ((value/180)*100)+'%';
+            case 'special-defense': return ((value/230)*100)+'%';
+            case 'speed': return ((value/200)*100)+'%';
+            case 'total': return (((value-170)/(720-170))*100)+'%';
             default: return 0;
         }
     }
@@ -119,19 +118,21 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'center',
- //     gap: 10,
+        gap: 5,
     },
 
     statName: {
         width: '20%',
+        minWidth: 50,
         textTransform: 'capitalize',
         fontSize: 12,
         fontWeight: '500',
-        color: globalStyles.textblack
+        color: globalStyles.textblack,
     },
 
     statBaseStat: {
         width: '12%',
+        minWidth: 28,
         fontSize: 16,
         fontWeight: '400',
         color: globalStyles.textgrey,
@@ -139,18 +140,19 @@ const styles = StyleSheet.create({
     },
 
     statBarContainer: {
-        width: '50%',
-        height: 4
+        width: '55%',
+        height: 4,
+        paddingRight: 10
     },
 
     statBar: {
-        marginHorizontal: 10,
         backgroundColor: globalStyles.typenormal,
-        height: 4,
+        height: 4,        
     },
 
     statLow: {
        width: '9%',
+       minWidth: 26,
         fontSize: 16,
         fontWeight: '400',
         color: globalStyles.textgrey,
@@ -159,6 +161,7 @@ const styles = StyleSheet.create({
 
     statHigh: {
         width: '9%',
+        minWidth: 26,
         fontSize: 16,
         fontWeight: '400',
         color: globalStyles.textgrey,

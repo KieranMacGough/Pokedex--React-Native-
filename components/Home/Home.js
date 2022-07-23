@@ -12,36 +12,36 @@ import globalStyles from '../../styles/globalStyles.js';
 const Home = (props) => {
     const [searchPhrase, setSearchPhrase] = useState("");
     const [clicked, setClicked] = useState(false);
-    const [allPokemonData, setAllPokemonData] = useState([]);
+    // const [allPokemonData, setAllPokemonData] = useState([]);
     const [homeOption, setHomeOption] = useState('');
 
-// get data from the fake api endpoint
-    useEffect(() => {
-        var pokemonToAdd = [];
-        const getAllPokemonNames = async () => {
-            const api = new MainClient();
-            await api.pokemon
-                .listPokemons(1,5)
-                .then((data) => {
-                    const getAllPokemonData = async () => {                  
-                        for (let i = 1; i < 30; i++){
-                            await api.pokemon
-                                .getPokemonById(i)
-                                .then((data) => {
-                                   // pokemonToAdd((pokemonToAdd) => ([...pokemonToAdd,data]));
-                                   pokemonToAdd.push(data);
-                                    // console.log(data);
-                                })
-                        } 
-                        setAllPokemonData(pokemonToAdd);
+// // get data from the fake api endpoint
+//     useEffect(() => {
+//         var pokemonToAdd = [];
+//         const getAllPokemonNames = async () => {
+//             const api = new MainClient();
+//             await api.pokemon
+//                 .listPokemons(1,5)
+//                 .then((data) => {
+//                     const getAllPokemonData = async () => {                  
+//                         for (let i = 1; i < 30; i++){
+//                             await api.pokemon
+//                                 .getPokemonById(i)
+//                                 .then((data) => {
+//                                    // pokemonToAdd((pokemonToAdd) => ([...pokemonToAdd,data]));
+//                                    pokemonToAdd.push(data);
+//                                     // console.log(data);
+//                                 })
+//                         } 
+//                         setAllPokemonData(pokemonToAdd);
 
-                    } 
-                    getAllPokemonData();
-                })
-        }  
-        getAllPokemonNames();
-        // console.log({allPokemonData});
-    }, []);
+//                     } 
+//                     getAllPokemonData();
+//                 })
+//         }  
+//         getAllPokemonNames();
+//         // console.log({allPokemonData});
+//     }, []);
 
     useEffect(() => {
         console.log("Home option is now %s", homeOption);
@@ -70,10 +70,10 @@ const Home = (props) => {
                         <List 
                             searchPhrase={searchPhrase}
                             setSearchPhrase={setSearchPhrase}
-                            data={allPokemonData}
+                            data={props.allPokemonData}
                             setClicked={setClicked}
                             setPokemonProfile={props.setPokemonProfile}
-                            allPokemonData={allPokemonData}
+                            allPokemonData={props.allPokemonData}
                         />
                         {/* <Options /> */}
                     </View>

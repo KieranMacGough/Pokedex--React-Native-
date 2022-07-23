@@ -1,14 +1,12 @@
-import React, { useState, useEffect, startTransition } from 'react';
-import { TouchableOpacity, ScrollView, Dimensions, StatusBar, Image, View, TextInput, Text, StyleSheet, ActivityIndicator, BackHandler } from 'react-native';
-import PokeballTop from '../../images/vectors/patterns/PokeballTop.png';
+import React, { useState, useEffect } from 'react';
+import { TouchableOpacity, ScrollView, Dimensions, StatusBar, Image, View, Text, StyleSheet } from 'react-native';
 import TypeBadge from '../Home/TypeBadge';
 import globalStyles from '../../styles/globalStyles.js';
 import GradientNameText from '../GradientNameText';
-import Pokeball from '../../images/vectors/patterns/PokeballTab.png';
 import DotsSixByThree from '../../images/vectors/patterns/6x3.png';
 import Circle from '../../images/vectors/patterns/Circle.png';
 import Back from '../../images/vectors/icons/Back.png';
-import { Languages, MainClient } from 'pokenode-ts';
+import { MainClient } from 'pokenode-ts';
 import StatsTable from './StatsTable';
 import DataLine from './DataLine';
 import Tab from './Tab';
@@ -111,6 +109,7 @@ const Profile = (props) => {
             <View style={styles.box}>
                     {tab === "About" &&  
                         <View style={styles.boxContent}>
+                          {/* TODO: Fix Pokedex Entry language to be English on all. Eg. 746 Wishiwashi is Japanese*/}
                         <Text style={styles.boxPokedexEntry}>{pokedexEntry}</Text>
 
                             <Text style={[styles.boxTitle, {color: globalStyles["type"+props.mon.types[0].type.name]}]}>Pokédex Data</Text> 

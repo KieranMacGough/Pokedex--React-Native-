@@ -1,5 +1,5 @@
-import React, { useState, useEffect, startTransition } from 'react';
-import { TouchableOpacity, Image, ScrollView, View, TextInput, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import React from 'react';
+import { TouchableOpacity, Image, View, StyleSheet } from 'react-native';
 import generation from '../../images/vectors/icons/Generation.png';
 import sort from '../../images/vectors/icons/Sort.png';
 import filter from '../../images/vectors/icons/Filter.png';
@@ -34,14 +34,19 @@ const styles = StyleSheet.create({
   },
       
       navGeneration: {
-        height: '100%',
+        height: 25,
+        width: 25,
         marginRight: 20,
       },
       
       navSort: {
+        height: 25,
+        width: 25,
         marginRight: 20,
       },
       
       navFilter: {
+        height: 25,
+        width: 25,
       },
 })

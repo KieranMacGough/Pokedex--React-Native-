@@ -1,34 +1,54 @@
 // import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';;
+import React, { useEffect, useState  } from 'react';;
 import { StatusBar, StyleSheet, Text, View } from 'react-native';
 import globalStyles from './styles/globalStyles.js';
 import Home from './components/Home/Home.js';
 import Profile from './components/Profile/Profile.js';
 import { useFonts } from 'expo-font';
+import { MainClient } from 'pokenode-ts';
 
 
 export default function App() {
+  const [allPokemonData, setAllPokemonData] = useState([]);
   const [pokemonProfile, setPokemonProfile] = useState('');
+  const [pokemonLoaded, setPokemonLoaded] = useState(false);
   const [loaded] = useFonts({
     Inter: require('./fonts/Inter.ttf'),
   });
+
+  async function pokePromises() {
+    const api = new MainClient();
+    let promises = [];
+      for (let i = 1; i < 252; i++) {
+        promises.push(api.pokemon.getPokemonById(i));
+      }
+      return Promise.all(promises);
+  }
+
+   // get data from the fake api endpoint
+   useEffect(() => {
+    console.log("pokemonLoaded: ", pokemonLoaded);
+    if (!pokemonLoaded) {
+        pokePromises().then(results => {
+          setAllPokemonData(results);
+        })
+    }    
+}, []);
+
+useEffect( () => {
+  console.log("pokemonLoaded: ", pokemonLoaded);;
+}, [pokemonLoaded]);
+
   if (!loaded) {
     return null;
   }
-  const GradientText = ({colors, ...rest}) => {
-    return (
-      <MaskedView maskElement={<Text {...rest} />}>
-        <LinearGradient colors={colors} start={{x: 0, y: 0}} end={{x: 1, y: 0}}>
-          <Text {...rest} style={[rest.style, {opacity: 0}]} />
-        </LinearGradient>
-      </MaskedView>
-    );
-  };
+
+ 
 
   return (
     <>
         <View style={styles.container}>
-          {(pokemonProfile === '') ? (<Home setPokemonProfile={setPokemonProfile} /> ) : ( <Profile setPokemonProfile={setPokemonProfile} mon={pokemonProfile} /> ) }
+          {(pokemonProfile === '') ? (<Home setPokemonProfile={setPokemonProfile} allPokemonData={allPokemonData} /> ) : ( <Profile setPokemonProfile={setPokemonProfile} mon={pokemonProfile} /> ) }
         </View>
     </>
   )
