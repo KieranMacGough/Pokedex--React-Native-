@@ -25,7 +25,7 @@ export default function Pokemon(props) {
                 <Image onError={(e) => console.log(e.nativeEvent.error) } style={styles.sprite} source={{uri:`${props.mon.sprites.other["official-artwork"].front_default}`}} />
             <View style={styles.cardData}>
                 <Text style={styles.cardId}>{formatId(props.mon.id)}</Text>
-                <Text style={styles.cardName}>{props.mon.name}</Text>
+                <Text style={styles.cardName}>{props.mon.species.name}</Text>
                 <View style={styles.cardTypes}>
                 <TypeBadge type={props.mon.types[0].type.name} />
                         {props.mon.types.length === 2 && 

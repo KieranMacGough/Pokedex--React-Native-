@@ -4,17 +4,18 @@ import generation from '../../images/vectors/icons/Generation.png';
 import sort from '../../images/vectors/icons/Sort.png';
 import filter from '../../images/vectors/icons/Filter.png';
 
+
 export default function Navbar (props) {
 
     return (
     <View style={styles.navbar}>
-        <TouchableOpacity activeOpacity = { .8 } onPress={() => props.setHomeOption('generation')}>
+        <TouchableOpacity activeOpacity = { .8 } onPress={() => props.setDrawerOption('generation')}>
           <Image style={styles.navGeneration} source={generation} alt="generation" />
         </TouchableOpacity>
-        <TouchableOpacity activeOpacity = { .8 } onPress={() => props.setHomeOption('sort')}>
+        <TouchableOpacity activeOpacity = { .8 } onPress={() => props.setDrawerOption('sort')}>
           <Image style={styles.navSort} source={sort} alt="sort" />
         </TouchableOpacity>
-        <TouchableOpacity activeOpacity = { .8 } onPress={() => props.setHomeOption('filter')}>
+        <TouchableOpacity activeOpacity = { .8 } onPress={() => props.setDrawerOption('filter')}>
           <Image style={styles.navFilter} source={filter} alt="filter"  />
         </TouchableOpacity>
     </View>

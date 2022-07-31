@@ -1,17 +1,8 @@
-import React, { useState, useEffect, startTransition } from 'react';
-import { TouchableOpacity, ScrollView, Dimensions, StatusBar, Image, View, TextInput, Text, StyleSheet, ActivityIndicator, BackHandler } from 'react-native';
-import PokeballTop from '../../images/vectors/patterns/PokeballTop.png';
-import TypeBadge from '../Home/TypeBadge';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import globalStyles from '../../styles/globalStyles.js';
-import GradientNameText from '../GradientNameText';
-import Pokeball from '../../images/vectors/patterns/PokeballTab.png';
-import DotsSixByThree from '../../images/vectors/patterns/6x3.png';
-import Circle from '../../images/vectors/patterns/Circle.png';
-import Back from '../../images/vectors/icons/Back.png';
-import { Languages, MainClient } from 'pokenode-ts';
-import StatsTable from './StatsTable';
 
-const ProfileDataLine = (props) => {
+const DataLine = (props) => {
     return (
         <Text style={styles.boxAbout}>
             <View style={styles.boxAboutTagContainer}>
@@ -21,7 +12,7 @@ const ProfileDataLine = (props) => {
     )
 }
 
-export default ProfileDataLine;
+export default DataLine;
 
 const styles = StyleSheet.create({
     boxAbout: {
