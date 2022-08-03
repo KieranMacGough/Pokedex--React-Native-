@@ -11,20 +11,28 @@ import StatsTable from './StatsTable';
 import DataLine from './DataLine';
 import Tab from './Tab';
 import Evolution from './Evolution';
+import TypeDefences from './TypeDefences';
 
 const Profile = (props) => {
+  const type = props.mon.types[0].type.name;
+  const defaultPhrase = "Unknown";
+  const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState("About");
   const [pokemonSpeciesData, setPokemonSpeciesData] = useState([]);
-  const [species, setSpecies] = useState('Unknown');
-  const [weight, setWeight] = useState('Unknown');
-  const [height, setHeight] = useState('Unknown');
-  const [growthRate, setGrowthRate] = useState('Unknown');
-  const [catchRate, setCatchRate] = useState('Unknown');
-  const [eggCycles, setEggCycles] = useState('Unknown');
-  const [pokedexEntry, setPokedexEntry] = useState('Unknown');
-  const [eggGroups, setEggGroups] = useState([]);
+  const [pokedexEntry, setPokedexEntry] = useState();
+  const [species, setSpecies] = useState(defaultPhrase);
+  const [weight, setWeight] = useState(defaultPhrase);
+  const [height, setHeight] = useState(defaultPhrase);
+  const [abilities, setAbilities] = useState(defaultPhrase);
+  const [growthRate, setGrowthRate] = useState(defaultPhrase);
+  const [catchRate, setCatchRate] = useState(defaultPhrase);
+  const [eggCycles, setEggCycles] = useState(defaultPhrase);
+  const [eggGroups, setEggGroups] = useState(defaultPhrase);
+  const [gender, setGender] = useState(defaultPhrase);
+  const [evYield, setEvYield] = useState(defaultPhrase);
   const [evolutionChainId, setEvolutionChainId] = useState();
   const [evolutionChainData, setEvolutionChainData] = useState();
+  const [types, setTypes] = useState([]);
 
   function cmToFtInches(num) {
     const realFeet = ((num * 0.393700) / 12);
@@ -45,32 +53,61 @@ const Profile = (props) => {
           setPokemonSpeciesData(data);
           setGrowthRate(data.growth_rate.name.replace(/\-/g, " "));
           setCatchRate(data.capture_rate);
-          setEggCycles(data.hatch_counter + ' (' + (data.hatch_counter * 255).toLocaleString('en-US') + '-' + (data.hatch_counter * 257).toLocaleString('en-US') + ' steps)');
-          for (let i = 0; i < data.genera.length; i++) {
-            if (data.flavor_text_entries[i].language.name === 'en') {
-              setPokedexEntry(data.flavor_text_entries[i].flavor_text.replace(/[\n\f]/g, ' '));
-            }
-          }
+          setGender(data.gender_rate);
+          setEggCycles(data.hatch_counter + ' (' + (data.hatch_counter * 255).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' - ' + (data.hatch_counter * 257).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' steps)');
 
           for (let i = 0; i < data.genera.length; i++) {
             if (data.genera[i].language.name === 'en') {
               setSpecies(data.genera[i].genus);
             }
+            if (data.flavor_text_entries[i].language.name === 'en') {
+              setPokedexEntry(data.flavor_text_entries[i].flavor_text.replace(/[\n\f]/g, ' '));
+            }
           }
-          setEggGroups(data.egg_groups.map(x => (x.name)))
+          const eggGroupsArr = data.egg_groups.map(x => (x.name));
+          setEggGroups(eggGroupsArr.join(', '))
+
+          let evArr = [];
+          for (let i = 0; i < props.mon.stats.length; i++) {
+            if (props.mon.stats[i].effort > 0) {
+              evArr.push(props.mon.stats[i].effort + ' ' + formatStat(props.mon.stats[i].stat.name))
+            }
+          }
+          console.log(evArr);
+          setEvYield(evArr.join('\n'));
+
+          let abilitiesArr = [];
+          for (let i = 0; i < props.mon.abilities.length; i++) {
+            if (props.mon.abilities[i].is_hidden) {
+              abilitiesArr.push(props.mon.abilities[i].ability.name + ' (hidden ability)')
+            }
+            if (!props.mon.abilities[i].is_hidden) {
+              abilitiesArr.push(props.mon.abilities[i].ability.name)
+            }
+          }
+          setAbilities(abilitiesArr.join('\n'));
+
+          let typesArr = [];
+          for (let i = 0; i < props.mon.types.length; i++) {
+            typesArr.push(props.mon.types[i].type.name)
+          }
+          setTypes(typesArr);
 
           // Get Evolution Data
           const urlPath = data.evolution_chain.url;
           setEvolutionChainId(urlPath.substring(urlPath.indexOf('chain/') + 6).slice(0, -1));
+
         })
+      setLoading(false);
     }
     getPokemonSpeciesData();
+
   }, []);
 
   useEffect(() => {
     const getEvolutionChainData = async () => {
-    if (evolutionChainId != null) {
-      console.log(evolutionChainId);
+      if (evolutionChainId != null) {
+        console.log(evolutionChainId);
         const api = new EvolutionClient();
         await api
           .getEvolutionChainById(evolutionChainId)
@@ -81,6 +118,19 @@ const Profile = (props) => {
     }
     getEvolutionChainData();
   }, [evolutionChainId]);
+
+  function formatStat(stat) {
+    switch (stat) {
+      case 'hp': return 'HP';
+      case 'attack': return 'Attack';
+      case 'defense': return 'Defense';
+      case 'special-attack': return 'Special Attack';
+      case 'special-defense': return 'Special Defence';
+      case 'speed': return 'Speed';
+      default: return '';
+    }
+  }
+
 
   // console.log(props);
   // console.log(pokemonSpeciesData);
@@ -96,16 +146,14 @@ const Profile = (props) => {
     return num;
   }
 
-
-
   return (
-    <ScrollView style={[styles.container, { backgroundColor: globalStyles["backgroundtype" + props.mon.types[0].type.name] }]}>
+    <ScrollView style={[styles.container, { backgroundColor: globalStyles["backgroundtype" + type] }]}>
       <TouchableOpacity style={styles.backArrowTouchable} activeOpacity={.8} onPress={() => (props.setPokemonProfile(''))}>
         <Image style={styles.backArrow} source={Back} />
       </TouchableOpacity>
       <View style={styles.pokemonTitleContainerContainer}>
         <View style={styles.pokemonTitleContainer}>
-          <GradientNameText style={styles.pokemonTitle} color={globalStyles["backgroundtype" + props.mon.types[0].type.name]} name={props.mon.species.name} />
+          <GradientNameText style={styles.pokemonTitle} color={globalStyles["backgroundtype" + type]} name={props.mon.species.name} />
         </View>
       </View>
       <View style={styles.Profile}>
@@ -133,52 +181,53 @@ const Profile = (props) => {
 
       </View>
       <View style={styles.box}>
-        {tab === "About" &&
-          <View style={styles.boxContent}>
-            {/* TODO: Fix Pokedex Entry language to be English on all. Eg. 746 Wishiwashi is Japanese*/}
-            <Text style={styles.boxPokedexEntry}>{pokedexEntry}</Text>
+        {!loading && <>
+          {tab == "About" &&
+            <View style={styles.boxContent}>
+              {/* TODO: Fix Pokedex Entry language to be English on all. Eg. 746 Wishiwashi is Japanese*/}
+              <Text style={styles.boxPokedexEntry}>{pokedexEntry}</Text>
 
-            <Text style={[styles.boxTitle, { color: globalStyles["type" + props.mon.types[0].type.name] }]}>Pokédex Data</Text>
-            <DataLine tag={"Species"} data={species} />
-            <DataLine tag={"Height"} data={height} />
-            <DataLine tag={"Weight"} data={weight} />
-            <DataLine tag={"Abilities"} data={''} />
-            <DataLine tag={"Weaknesses"} data={''} />
+              <Text style={[styles.boxTitle, { color: globalStyles["type" + type] }]}>Pokédex Data</Text>
+              <DataLine tag={"Species"} data={species} />
+              <DataLine tag={"Height"} data={height} />
+              <DataLine tag={"Weight"} data={weight} />
+              <DataLine tag={"Abilities"} data={abilities} />
+              <DataLine tag={"Weaknesses"} data={types} types={types} />
 
-            <Text style={[styles.boxTitle, { color: globalStyles["type" + props.mon.types[0].type.name] }]}>Training</Text>
-            <DataLine tag={"EV Yield"} data={''} />
-            <DataLine tag={"Catch Rate"} data={catchRate} />
-            <DataLine tag={"Base Friendship"} data={pokemonSpeciesData.base_happiness} />
-            <DataLine tag={"Base Exp"} data={props.mon.base_experience} />
-            <DataLine tag={"Growth Rate"} data={growthRate} />
+              <Text style={[styles.boxTitle, { color: globalStyles["type" + type] }]}>Training</Text>
+              <DataLine tag={"EV Yield"} data={evYield} />
+              <DataLine tag={"Catch Rate"} data={catchRate} />
+              <DataLine tag={"Base Friendship"} data={pokemonSpeciesData.base_happiness} />
+              <DataLine tag={"Base Exp"} data={props.mon.base_experience} />
+              <DataLine tag={"Growth Rate"} data={growthRate} />
 
-            <Text style={[styles.boxTitle, { color: globalStyles["type" + props.mon.types[0].type.name] }]}>Breeding</Text>
-            <DataLine tag={"Egg Groups"} data={eggGroups.join(", ")} />
-            <DataLine tag={"Egg Cycles"} data={eggCycles} />
+              <Text style={[styles.boxTitle, { color: globalStyles["type" + type] }]}>Breeding</Text>
+              <DataLine tag={"Gender"} data={gender} />
+              <DataLine tag={"Egg Groups"} data={eggGroups} />
+              <DataLine tag={"Egg Cycles"} data={eggCycles} />
 
-            <Text style={[styles.boxTitle, { color: globalStyles["type" + props.mon.types[0].type.name] }]}>Location</Text>
-            <View style={{ height: 10 }}></View>
-          </View>
-        }
-        {tab === "Stats" &&
-          <View style={styles.boxContent}>
-            <Text style={[styles.boxTitle, { color: globalStyles["type" + props.mon.types[0].type.name] }]}>Base Stats</Text>
-            <View style={styles.statGrid}>
-              <StatsTable stats={props.mon.stats} type={props.mon.types[0].type.name} />
+              <Text style={[styles.boxTitle, { color: globalStyles["type" + type] }]}>Location</Text>
+            </View>}
+          {tab == "Stats" &&
+            <View style={styles.boxContent}>
+              <Text style={[styles.boxTitle, { color: globalStyles["type" + type] }]}>Base Stats</Text>
+              <View style={styles.statGrid}>
+                <StatsTable stats={props.mon.stats} type={type} />
+              </View>
+              <Text style={styles.statsExplained}>The ranges shown on the right are for a level 100 Pokémon. Maximum values are based on a beneficial nature, 252 EVs, 31 IVs; minimum values are based on a hindering nature, 0 EVs, 0 IVs</Text>
+              <Text style={[styles.boxTitle, { color: globalStyles["type" + type] }]}>Type Defences</Text>
+              <Text style={[styles.boxPokedexEntry, { marginBottom: 20 }]}>The effectiveness of each type on {props.mon.species.name[0].toUpperCase() + props.mon.species.name.slice(1)}.</Text>
+              <TypeDefences types={types} />
             </View>
-            <Text style={styles.statsExplained}>The ranges shown on the right are for a level 100 Pokémon. Maximum values are based on a beneficial nature, 252 EVs, 31 IVs; minimum values are based on a hindering nature, 0 EVs, 0 IVs</Text>
-            <Text style={[styles.boxTitle, { color: globalStyles["type" + props.mon.types[0].type.name] }]}>Type Defences</Text>
-            <View style={{ height: 10 }}></View>
-          </View>
+          }
+          {tab == "Evolution" &&
+            <View style={styles.boxContent}>
+              <Text style={[styles.boxTitle, { color: globalStyles["type" + type] }]}>Evolution Chart</Text>
+              <Evolution evolutionChainData={evolutionChainData} />
+            </View>
+          }
+        </>
         }
-        {tab === "Evolution" &&
-          <View style={styles.boxContent}>
-            <Text style={[styles.boxTitle, { color: globalStyles["type" + props.mon.types[0].type.name] }]}>Evolution Chart</Text>
-            <Evolution evolutionChainData={evolutionChainData} />
-            <View style={{ height: 10 }}></View>
-          </View>
-        }
-
       </View>
 
     </ScrollView>
@@ -190,15 +239,12 @@ export default Profile;
 const styles = StyleSheet.create({
 
   root: {
-    boxSizing: 'border-box',
+    // boxSizing: 'border-box',
   },
 
   container: {
-    padding: 0,
-    margin: 0,
     width: '100%',
     backgroundColor: globalStyles.backgroundtypenormal,
-    paddingTop: StatusBar.currentHeight,
   },
 
   backArrowTouchable: {
@@ -316,12 +362,13 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: globalStyles.backgroundwhite,
     borderTopLeftRadius: 30,
-    borderTopRightRadius: 30
+    borderTopRightRadius: 30,
+    paddingHorizontal: 40,
   },
 
   boxContent: {
-    marginHorizontal: 40,
     marginTop: 40,
+    paddingBottom: 40,
     flexGrow: 0
   },
 

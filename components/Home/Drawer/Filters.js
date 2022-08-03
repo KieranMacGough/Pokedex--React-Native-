@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import {
     ScrollView,
     FlatList
-  } from 'react-native-gesture-handler';
+} from 'react-native-gesture-handler';
 import globalStyles from './../../../styles/globalStyles.js';
 import DrawerHeader from './DrawerHeader.js';
 import GenerationTile from './GenerationTile.js';
@@ -13,6 +13,8 @@ import CustomLabel from '../../Slider/CustomLabel';
 import Svg, { SvgUri, Circle } from 'react-native-svg';
 import svgTypes from '../../../images/vectors/types/index.js';
 import TypeSvgIcon from './TypeSvgIcon.js';
+import HeightSvgIcon from './HeightSvgIcon.js';
+import WeightSvgIcon from './WeightSvgIcon.js';
 import BottomSheet, { BottomSheetScrollView, BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { NativeViewGestureHandler } from 'react-native-gesture-handler';
 
@@ -37,21 +39,39 @@ const allTypesFalse = {
     'water': false,
 };
 
+const allHeightsFalse = {
+    'short': false,
+    'medium': false,
+    'tall': false,
+}
+
+const allWeightsFalse = {
+    'light': false,
+    'normal': false,
+    'heavy': false,
+}
+
 const Filters = (props) => {
     function reset() {
         console.log("reset");
 
         props.setTypeFilters(allTypesFalse);
-         setTypeTilesSelected(allTypesFalse);
-        setNonCollidingMultiSliderValue([1,globalStyles.MAX_POKEMON_NUMBER]);
+        setTypeTilesSelected(allTypesFalse);
+        props.setHeightFilters(allHeightsFalse);
+        setHeightTilesSelected(allHeightsFalse);
+        props.setWeightFilters(allWeightsFalse);
+        setWeightTilesSelected(allWeightsFalse);
+        setNonCollidingMultiSliderValue([1, globalStyles.MAX_POKEMON_NUMBER]);
     }
 
     function apply() {
         console.log("apply");
         props.setTypeFilters(typeTilesSelected);
+        props.setHeightFilters(heightTilesSelected);
+        props.setWeightFilters(weightTilesSelected);
         props.setRangeFilter(nonCollidingMultiSliderValue);
-        props.pokemonListRef.current.scrollToOffset({ animated: true, y: 0 });
-        setTimeout(() => {props.bottomSheetRef.current.close()}, 250);
+        (props.pokemonListRef.current && props.pokemonListRef.current.scrollToOffset({ animated: true, y: 0 }));
+        setTimeout(() => { props.bottomSheetRef.current.close() }, 250);
     }
 
     // Range Slider
@@ -61,11 +81,21 @@ const Filters = (props) => {
 
 
     const [typeTilesSelected, setTypeTilesSelected] = useState(props.typeFilters);
+    const [heightTilesSelected, setHeightTilesSelected] = useState(props.heightFilters);
+    const [weightTilesSelected, setWeightTilesSelected] = useState(props.weightFilters);
 
     useEffect(() => {
         console.log("typeTilesSelected Updated: ", typeTilesSelected)
     }, [typeTilesSelected]);
-    
+
+    useEffect(() => {
+        console.log("heightTilesSelected Updated: ", heightTilesSelected)
+    }, [heightTilesSelected]);
+
+    useEffect(() => {
+        console.log("weightTilesSelected Updated: ", weightTilesSelected)
+    }, [weightTilesSelected]);
+
     // Types
     const typeTileHandler = ((id) => {
         console.log("Tile Handler inputs: ", id);
@@ -75,40 +105,68 @@ const Filters = (props) => {
         console.log("New Tiles: ", newTiles);
         setTypeTilesSelected(newTiles);
     })
-    
+
+        // Heights
+    const heightTileHandler = ((id) => {
+        console.log("Tile Handler inputs: ", id);
+        let newTiles = { ...heightTilesSelected };
+        console.log("Old Tiles: ", newTiles);
+        newTiles[id] = !newTiles[id];
+        console.log("New Tiles: ", newTiles);
+        setHeightTilesSelected(newTiles);
+    })
+
+            // Weights
+            const weightTileHandler = ((id) => {
+                console.log("Tile Handler inputs: ", id);
+                let newTiles = { ...weightTilesSelected };
+                console.log("Old Tiles: ", newTiles);
+                newTiles[id] = !newTiles[id];
+                console.log("New Tiles: ", newTiles);
+                setWeightTilesSelected(newTiles);
+            })
+
     //render Icons
     const typeIcons = Object.keys(typeTilesSelected).map((item, i) => (
-        <TypeSvgIcon key={i} id={item} typeTilesSelected={typeTilesSelected} typeTileHandler={typeTileHandler}/>
-        ))
-        // console.warn(item),
+        <TypeSvgIcon key={i} id={item} typeTilesSelected={typeTilesSelected} typeTileHandler={typeTileHandler} />
+    ))
+
+    const heightIcons = Object.keys(heightTilesSelected).map((item, i) => (
+        <HeightSvgIcon key={i} id={item} heightTilesSelected={heightTilesSelected} heightTileHandler={heightTileHandler} />
+    ))
+
+    const weightIcons = Object.keys(weightTilesSelected).map((item, i) => (
+        <WeightSvgIcon key={i} id={item} weightTilesSelected={weightTilesSelected} weightTileHandler={weightTileHandler} />
+    ))
+    // console.warn(item),
     return (
-        
-        <View style={styles.container}>
+
+        <BottomSheetScrollView contentContainerStyle={styles.container}>
             <DrawerHeader
                 title="Filter"
                 description="Use advanced search to explore Pokémon by type, weakness, height and more!"
             />
             <Text style={styles.subtitle}>Types</Text>
-            
+
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
                 {typeIcons}
             </ScrollView>
-           
 
-            <Text style={styles.subtitle}>Weakness</Text>
-            <View style={styles.horizontalList}>
+            {/* TODO: Lots of work to calculate weaknesses of each Pokemon for the filter. */}
+            {/* <Text style={styles.subtitle}>Weakness</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
 
-            </View>
+            </ScrollView> */}
 
             <Text style={styles.subtitle}>Heights</Text>
-            <View style={styles.horizontalList}>
-
-            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
+                {heightIcons}
+            </ScrollView>
 
             <Text style={styles.subtitle}>Weights</Text>
-            <View style={styles.horizontalList}>
-
-            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
+                {weightIcons}
+            </ScrollView>
 
             <Text style={styles.subtitle}>Number Range</Text>
             <View style={styles.slider}>
@@ -120,12 +178,12 @@ const Filters = (props) => {
                     ]}
                     selectedStyle={{
                         backgroundColor: globalStyles.typepsychic,
-                      }}
-                      unselectedStyle={{
+                    }}
+                    unselectedStyle={{
                         backgroundColor: globalStyles.backgrounddefaultinput,
-                      }}
-                    
+                    }}
                     onValuesChange={nonCollidingMultiSliderValuesChange}
+                    sliderLength={globalStyles.MAX_POKEMON_NUMBER/3}
                     min={1}
                     max={globalStyles.MAX_POKEMON_NUMBER}
                     step={1}
@@ -152,7 +210,7 @@ const Filters = (props) => {
                     <Text>Apply</Text>
                 </TouchableOpacity>
             </View>
-        </View>
+        </BottomSheetScrollView>
     )
 }
 
@@ -161,7 +219,7 @@ export default Filters;
 const styles = StyleSheet.create({
     container: {
         display: 'flex',
-        marginHorizontal: 40,
+        marginLeft: 40,
         marginTop: 5,
         alignItems: 'flex-start',
         justifyContent: 'center'
@@ -176,24 +234,22 @@ const styles = StyleSheet.create({
     drawerDesc: {
         fontSize: 16,
         color: globalStyles.textgrey,
-        paddingBottom: 35,
-        fontWeight: '400'
+        paddingBottom: 30,
+        fontWeight: '400',
+        marginRight: 40
     },
 
     subtitle: {
         fontSize: 16,
         color: globalStyles.textblack,
-        paddingBottom: 10,
+        paddingBottom: 5,
         fontWeight: '700'
     },
 
     horizontalList: {
-        marginHorizontal: "auto",
-        // flexDirection: "row",
-        // flexWrap: "nowrap",
-        // alignItems: 'center',
-        // justifyContent: 'center',
-        
+        marginRight: 0,
+        marginBottom: 30
+
     },
     tile: {
         flex: 1,
@@ -207,10 +263,12 @@ const styles = StyleSheet.create({
 
     slider: {
         display: 'flex',
+        alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: 10,
-        marginBottom: 70
+        marginBottom: 30,
+        marginRight: 40
     },
 
     sliderValues: {
@@ -220,7 +278,8 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         display: 'flex',
-        flexDirection: 'row'
+        flexDirection: 'row',
+        marginBottom: 10
     },
 
     btn: {

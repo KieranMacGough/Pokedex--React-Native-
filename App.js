@@ -1,13 +1,12 @@
 // import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';;
-import { StatusBar, StyleSheet, Text, View } from 'react-native';
+import { StatusBar, View, StyleSheet, SafeAreaView } from 'react-native';
 import globalStyles from './styles/globalStyles.js';
 import Home from './components/Home/Home.js';
 import Profile from './components/Profile/Profile.js';
 import { useFonts } from 'expo-font';
 import { MainClient } from 'pokenode-ts';
 import { GestureHandlerRootView, gestureHandlerRootHOC } from 'react-native-gesture-handler';
-import svgTypes from './images/vectors/types/index.js';
 
 export default function App() {
   const [allPokemonData, setAllPokemonData] = useState([]);
@@ -15,6 +14,7 @@ export default function App() {
   const [pokemonLoaded, setPokemonLoaded] = useState(false);
   // Saved Filters
   const [searchPhrase, setSearchPhrase] = useState("");
+  const [sort, setSort] = useState('numLow');
   const [generationFilters, setGenerationFilters] = useState([false, false, false, false, false, false, false, false]);
   const [typeFilters, setTypeFilters] = useState({
     'bug': false,
@@ -35,6 +35,16 @@ export default function App() {
     'rock': false,
     'steel': false,
     'water': false,
+  });
+  const [heightFilters, setHeightFilters] = useState({
+    'short': false,
+    'medium': false,
+    'tall': false,
+  });
+  const [weightFilters, setWeightFilters] = useState({
+    'light': false,
+    'normal': false,
+    'heavy': false,
   });
   const [rangeFilter, setRangeFilter] = useState([1, globalStyles.MAX_POKEMON_NUMBER])
 
@@ -59,14 +69,12 @@ useEffect(() => {
 
   // get data from the api endpoint
   useEffect(() => {
-    // Make filters
- 
     // Get API Data
     console.log("pokemonLoaded: ", pokemonLoaded);
     if (!pokemonLoaded) {
       pokePromises().then(results => {
         setAllPokemonData(results);
-        setLoading(false)
+        setLoading(false);
       })
     }
   }, []);
@@ -75,13 +83,14 @@ useEffect(() => {
     console.log("pokemonLoaded: ", pokemonLoaded);;
   }, [pokemonLoaded]);
 
-  if (!loaded) {
-    return null;
-  }
+  // if (!loaded) {
+  //   return null;
+  // }
 
 
 
   return (
+    
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={styles.container}>
         {(pokemonProfile === '')
@@ -91,10 +100,16 @@ useEffect(() => {
             loading={loading}
             setPokemonProfile={setPokemonProfile}
             allPokemonData={allPokemonData}
+            sort={sort}
+            setSort={setSort}
             generationFilters={generationFilters}
             setGenerationFilters={setGenerationFilters}
             typeFilters={typeFilters}
             setTypeFilters={setTypeFilters}
+            heightFilters={heightFilters}
+            setHeightFilters={setHeightFilters}
+            weightFilters={weightFilters}
+            setWeightFilters={setWeightFilters}
             rangeFilter={rangeFilter}
             setRangeFilter={setRangeFilter}
 

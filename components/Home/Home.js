@@ -1,28 +1,24 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { StatusBar, Image, View, TextInput, Text, StyleSheet, ActivityIndicator, Dimensions, Button } from 'react-native';
+import { StatusBar, Image, View, Text, StyleSheet, Dimensions } from 'react-native';
 import PokeballTop from '../../images/vectors/patterns/PokeballTop.png';
-import { MainClient } from 'pokenode-ts';
 import Navbar from './Navbar.js';
 import SearchBar from './SearchBar.js';
 import List from './List.js';
-import Options from './Options.js';
 import globalStyles from '../../styles/globalStyles.js';
-import Animated from 'react-native-reanimated';
 import BottomSheet, { BottomSheetScrollView, BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import Generations from "./Drawer/Generations.js";
 import Filters from "./Drawer/Filters.js";
+import Sort from "./Drawer/Sort.js";
 
 const Home = (props) => {
     const [clicked, setClicked] = useState(false);
     const [drawerOption, setDrawerOption] = useState('');
     const [filteredData, setFilteredData] = useState([]);
-    const [isDrawerVisible, setIsDrawerVisible] = useState(false);
-    const [bottomSheetPosition, setBottomSheetPosition] = useState(-1);
 
     useEffect(() => {
         if (props.allPokemonData) {
             let _filteredData = []
-
+            console.log("Filter check", props.heightFilters)
             _filteredData = props.allPokemonData.filter((item) => {
 
                 if (
@@ -42,25 +38,37 @@ const Home = (props) => {
                         || item.id >= 722 && item.id <= 809 && props.generationFilters[6]
                         || item.id >= 810 && item.id <= 905 && props.generationFilters[7]
                         || props.generationFilters.every(element => element === false))
-                        && 
+                    &&
                     //Filter by type
-                    (props.typeFilters[item.types[0].type.name] 
-                        || (item.types[1] && props.typeFilters[item.types[1].type.name]) 
+                    (props.typeFilters[item.types[0].type.name]
+                        || (item.types[1] && props.typeFilters[item.types[1].type.name])
                         || Object.values(props.typeFilters).every(value => !value))
                     &&
+                    //Filter by height -- 1 unit = 10cm
+                    (props.heightFilters['short'] && item.height <= 12
+                        || props.heightFilters['medium'] && item.height > 12 && item.height < 22
+                        || props.heightFilters['tall'] && item.height >= 22
+                        || Object.values(props.heightFilters).every(value => !value))
+                    &&
+                    //Filter by weight -- 1 unit = 100g
+                    (props.weightFilters['light'] && item.weight <= 445
+                    || props.weightFilters['normal'] && item.weight > 445 && item.weight < 2250
+                    || props.weightFilters['heavy'] && item.weight > 2250
+                    || Object.values(props.weightFilters).every(value => !value))
+                &&
                     //Filter by range
                     (item.id >= props.rangeFilter[0] && item.id <= props.rangeFilter[1])
                 ) return item
             })
             setFilteredData(_filteredData)
         }
-    }, [props.searchPhrase, props.generationFilters, props.allPokemonData, props.typeFilters, props.rangeFilter])
+    }, [props.searchPhrase, props.generationFilters, props.allPokemonData, props.typeFilters, props.heightFilters, props.weightFilters, props.rangeFilter])
 
 
     useEffect(() => {
         console.log("Drawer option is now", drawerOption);
         if (drawerOption != "") {
-            bottomSheetRef.current.snapToIndex(0);
+            bottomSheetRef.current.snapToIndex(1);
         }
     }, [drawerOption]);
 
@@ -75,30 +83,24 @@ const Home = (props) => {
     const pokemonListRef = useRef(null)
 
     // variables
-    const snapPoints = useMemo(() => ['50%', '95%'], []);
+    const snapPoints = useMemo(() => [ '65%', '92%'], []);
 
     // callbacks
     const handleSheetChanges = useCallback((index) => {
-        setBottomSheetPosition(index);
         if (index == -1) {
             setDrawerOption("");
-            setIsDrawerVisible(false);
-        }
-        if (index >= 0) {
-            setIsDrawerVisible(true);
         }
         console.log('handleSheetChanges', index);
 
     }, []);
 
-    // renders
     const renderBackdrop = useCallback(
         props => (
             // https://gorhom.github.io/react-native-bottom-sheet/components/bottomsheetbackdrop
             <BottomSheetBackdrop
                 {...props}
-                disappearsOnIndex={-1}
-                appearsOnIndex={0}
+                disappearsOnIndex={0}
+                appearsOnIndex={1}
                 opacity={0.5}
             />
         ),
@@ -139,8 +141,8 @@ const Home = (props) => {
                                 setClicked={setClicked}
                                 setPokemonProfile={props.setPokemonProfile}
                                 filteredData={filteredData}
+                                sort={props.sort}
                             />
-                            {/* <Options /> */}
                         </View>
                     </View>
                 </View>
@@ -156,19 +158,29 @@ const Home = (props) => {
                         <View style={styles.bottomSheetContent}>
                             {drawerOption == "generation" &&
                                 <Generations
-                                pokemonListRef={pokemonListRef}
+                                    pokemonListRef={pokemonListRef}
                                     bottomSheetRef={bottomSheetRef}
+                                   
                                     generationFilters={props.generationFilters}
                                     setGenerationFilters={props.setGenerationFilters}
                                 />
                             }
                             {drawerOption == 'sort' &&
-                                <Text>THIS IS THE SORT DRAWER!</Text>
+                                <Sort 
+                                pokemonListRef={pokemonListRef}
+                                bottomSheetRef={bottomSheetRef}
+                                    sort={props.sort}
+                                    setSort={props.setSort}
+                                />
                             }
                             {drawerOption == 'filter' &&
-                                <Filters 
-                                pokemonListRef={pokemonListRef}
+                                <Filters
+                                    pokemonListRef={pokemonListRef}
                                     bottomSheetRef={bottomSheetRef}
+                                    heightFilters={props.heightFilters}
+                                    setHeightFilters={props.setHeightFilters}
+                                    weightFilters={props.weightFilters}
+                                    setWeightFilters={props.setWeightFilters}
                                     typeFilters={props.typeFilters}
                                     setTypeFilters={props.setTypeFilters}
                                     rangeFilter={props.rangeFilter}
@@ -192,8 +204,6 @@ const styles = StyleSheet.create({
     },
 
     container: {
-        padding: 0,
-        margin: 0,
     },
 
     Navbar: {
@@ -210,7 +220,7 @@ const styles = StyleSheet.create({
     Home: {
         display: 'flex',
         flexDirection: 'column',
-        paddingTop: StatusBar.currentHeight,
+       // paddingTop: StatusBar.currentHeight,
         marginHorizontal: 40
     },
 
@@ -219,7 +229,7 @@ const styles = StyleSheet.create({
         top: StatusBar.currentHeight,
         left: 0,
         width: Dimensions.get('window').width,
-        height: Math.round(Dimensions.get('window').width) * (207 / 414),
+      //  height: Math.round(Dimensions.get('window').width) * (207 / 414),
     },
 
     title: {

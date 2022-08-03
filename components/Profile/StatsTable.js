@@ -6,17 +6,16 @@ const StatsTable = (props) => {
     const [statsTable, setStatsTable] = useState();
     const [statsTotal, setStatsTotal] = useState(0);
 
-    function addStatsToTotal(){
+    function addStatsToTotal() {
         let statTotal = 0
-        for (var i = 0; i < props.stats.length; i++)
-        {
+        for (var i = 0; i < props.stats.length; i++) {
             statTotal += Number(props.stats[i].base_stat);
         }
         setStatsTotal(statTotal);
     }
 
     function formatStat(stat) {
-        switch(stat) {
+        switch (stat) {
             case 'hp': return 'HP';
             case 'attack': return 'Attack';
             case 'defense': return 'Defense';
@@ -27,73 +26,64 @@ const StatsTable = (props) => {
         }
     }
 
-    function calcStatBarWidth(name, value ){
-        switch(name){
-            case 'hp': return ((value/255)*100)+'%';
-            case 'attack': return ((value/181)*100)+'%';
-            case 'defense': return ((value/230)*100)+'%';
-            case 'special-attack': return ((value/180)*100)+'%';
-            case 'special-defense': return ((value/230)*100)+'%';
-            case 'speed': return ((value/200)*100)+'%';
-            case 'total': return (((value-170)/(720-170))*100)+'%';
+    function calcStatBarWidth(name, value) {
+        switch (name) {
+            case 'hp': return ((value / 255) * 100) + '%';
+            case 'attack': return ((value / 181) * 100) + '%';
+            case 'defense': return ((value / 230) * 100) + '%';
+            case 'special-attack': return ((value / 180) * 100) + '%';
+            case 'special-defense': return ((value / 230) * 100) + '%';
+            case 'speed': return ((value / 200) * 100) + '%';
+            case 'total': return (((value - 170) / (720 - 170)) * 100) + '%';
             default: return 0;
         }
     }
     useEffect(() => {
         addStatsToTotal();
-        const createStatsTable = props.stats.map((stat) => 
+        const createStatsTable = props.stats.map((stat) =>
             <View key={stat.stat.name} style={styles.rowContainer}>
                 <Text style={styles.statName}>
-                   {formatStat(stat.stat.name)}
+                    {formatStat(stat.stat.name)}
                 </Text>
                 <Text style={styles.statBaseStat}>
                     {stat.base_stat}
                 </Text>
                 <View style={styles.statBarContainer}>
-                    <View style={[styles.statBar, {backgroundColor: globalStyles["type"+props.type], width: calcStatBarWidth(stat.stat.name, stat.base_stat)}]}>
+                    <View style={[styles.statBar, { backgroundColor: globalStyles["type" + props.type], width: calcStatBarWidth(stat.stat.name, stat.base_stat) }]}>
                     </View>
                 </View>
-                    <Text style={styles.statLow}>
-                        {stat.stat.name === 'hp'
+                <Text style={styles.statLow}>
+                    {stat.stat.name === 'hp'
                         // HP Calulator: (((2x Base+ IV + (EV/4)*Level)/100)+Level+10)
-                        ? (Math.floor((((2*stat.base_stat+0+(0/4))*100)/100)+110))
+                        ? (Math.floor((((2 * stat.base_stat + 0 + (0 / 4)) * 100) / 100) + 110))
                         //  Stat Calulator: ((((2*Base+IV+(EV/4)*Level)/100)+5)*Nature) 
-                        : (Math.floor(((((2*stat.base_stat+0+(0/4))*100)/100)+5)*0.9))
-                        }
-                    </Text>
-                    <Text style={styles.statHigh}>
-                        {stat.stat.name === 'hp'
+                        : (Math.floor(((((2 * stat.base_stat + 0 + (0 / 4)) * 100) / 100) + 5) * 0.9))
+                    }
+                </Text>
+                <Text style={styles.statHigh}>
+                    {stat.stat.name === 'hp'
                         // HP Calulator: (((2x Base+ IV + (EV/4)*Level)/100)+Level+10)
-                        ? (Math.floor((((2*stat.base_stat+31+(252/4))*100)/100)+110))
+                        ? (Math.floor((((2 * stat.base_stat + 31 + (252 / 4)) * 100) / 100) + 110))
                         //  Stat Calulator: ((((2*Base+IV+(EV/4)*Level)/100)+5)*Nature) 
-                        : (Math.floor(((((2*stat.base_stat+31+(252/4))*100)/100)+5)*1.1))
-                        }
-                    </Text>
+                        : (Math.floor(((((2 * stat.base_stat + 31 + (252 / 4)) * 100) / 100) + 5) * 1.1))
+                    }
+                </Text>
             </View>
         )
         setStatsTable(createStatsTable);
-    },[]);
+    }, []);
 
     return (
         <View style={styles.container}>
-             {statsTable}
-            <View style={[styles.rowContainer, {marginTop: 2.5}]}>
-            <Text style={styles.statName}>
-                   Total
-                </Text>
-                <Text style={[styles.statBaseStat, {fontSize:16}, {fontWeight:'700'}]}>
-                    {statsTotal}
-                </Text>
+            {statsTable}
+            <View style={[styles.rowContainer, { marginTop: 2.5 }]}>
+                <Text style={styles.statName}>Total</Text>
+                <Text style={[styles.statBaseStat, { fontSize: 16 }, { fontWeight: '700' }]}>{statsTotal}</Text>
                 <View style={styles.statBarContainer}>
-                <View style={[styles.statBar, {backgroundColor: globalStyles["backgroundtype"+props.type], width: calcStatBarWidth('total', statsTotal)}]}>
+                    <View style={[styles.statBar, { backgroundColor: globalStyles["backgroundtype" + props.type], width: calcStatBarWidth('total', statsTotal) }]}></View>
                 </View>
-                </View>
-                    <Text style={[styles.statLow, {fontSize:12, fontWeight:'500', color: globalStyles.textblack}]}>
-                        Min
-                    </Text>
-                    <Text style={[styles.statHigh, {fontSize:12, fontWeight:'500', color: globalStyles.textblack}]}>
-                        Max
-                    </Text>
+                <Text style={[styles.statLow, { fontSize: 12, fontWeight: '500', color: globalStyles.textblack }]}>Min</Text>
+                <Text style={[styles.statHigh, { fontSize: 12, fontWeight: '500', color: globalStyles.textblack }]}>Max</Text>
             </View>
         </View>
     )
@@ -109,21 +99,20 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'flex-end',
         alignItems: 'stretch',
-        width: '100%',
-        marginBottom: 22.5
-     },
+        maxWidth: '100%',
+        marginBottom: 22.5,
+        paddingHorizontal: 0
+    },
 
     rowContainer: {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'center',
-        gap: 5,
     },
 
     statName: {
-        width: '20%',
-        minWidth: 50,
+        width: '15%',
         textTransform: 'capitalize',
         fontSize: 12,
         fontWeight: '500',
@@ -136,23 +125,23 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '400',
         color: globalStyles.textgrey,
-        textAlign: 'right'
+        textAlign: 'right',
     },
 
     statBarContainer: {
-        width: '55%',
+        width: '49%',
         height: 4,
-        paddingRight: 10
+        paddingHorizontal: 15
     },
 
     statBar: {
         backgroundColor: globalStyles.typenormal,
-        height: 4,        
+        borderRadius: 2,
+        height: 4,
     },
 
     statLow: {
-       width: '9%',
-       minWidth: 26,
+        width: '12%',
         fontSize: 16,
         fontWeight: '400',
         color: globalStyles.textgrey,
@@ -160,8 +149,7 @@ const styles = StyleSheet.create({
     },
 
     statHigh: {
-        width: '9%',
-        minWidth: 26,
+        width: '12%',
         fontSize: 16,
         fontWeight: '400',
         color: globalStyles.textgrey,

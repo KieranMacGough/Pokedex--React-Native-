@@ -12,57 +12,68 @@ import {
 
 
 // definition of the Item, which will be rendered in the FlatList
-const Item = ({ item, setPokemonProfile, setSearchPhrase }) => (
+const Item = (props) => (
   <View style={{ flex: 1 }}>
-    <Pokemon mon={item} setPokemonProfile={setPokemonProfile} />
+    <Pokemon mon={props.item} setPokemonProfile={props.setPokemonProfile} />
   </View>
   // console.warn(item),
 );
 
 // the filter
-const List = ({ loading, searchPhrase, setClicked, setPokemonProfile, setSearchPhrase, filteredData, pokemonListRef }) => {
+const List = (props) => {
   const renderItem = ({ item }) => {
     // when no input, show all
-    if (searchPhrase === "") {
-      return <><Item item={item} setPokemonProfile={setPokemonProfile} /></>;
+    if (props.searchPhrase === "") {
+      return <><Item item={item} setPokemonProfile={props.setPokemonProfile} /></>;
     }
     // filter by name / first type / second type / id
     if (true) {
-      return <><Item item={item} setPokemonProfile={setPokemonProfile} /></>;
+      return <><Item item={item} setPokemonProfile={props.setPokemonProfile} /></>;
     }
   };
 
+  const keyExtractor = (item) => item.id
+  const getItemLayout=(data, index) => (
+    {length: 145, offset: 145 * index, index}
+  )
   return (
-    <SafeAreaView style={styles.list__container}>
-      <View
+      <View style={styles.list__container}
         onStartShouldSetResponder={() => {
-          setClicked(false);
+          props.setClicked(false);
         }}
       >
         {
-          loading ?
+          props.loading ?
           <View style={styles.warningBox}>
-            <Text>Loading...</Text>
+            <Text style={styles.warningText}>Loading...</Text>
           </View>
             :
-            filteredData && filteredData.length > 0 ? <FlatList
-              ref={pokemonListRef}
+            props.filteredData && props.filteredData.length > 0 ? 
+            <FlatList
+              ref={props.pokemonListRef}
               horizontal={false}
-              data={filteredData}
+              showsVerticalScrollIndicator={false}
               renderItem={renderItem}
-              keyExtractor={(item) => item.id}
-              style={{ paddingBottom: 540 }}
+              keyExtractor={keyExtractor}
+              getItemLayout={getItemLayout}
+              style={{ paddingBottom: 560 }}
               initialNumToRender={20}
               maxToRenderPerBatch={20}
               removeClippedSubviews={true}
+
+              data={ 
+                (props.sort == 'numLow' && props.filteredData.sort((a,b) => (a.id > b.id) ? 1 : -1)
+                || props.sort == 'numHigh' && props.filteredData.sort((a,b) => (a.id > b.id) ? -1 : 1)
+                || props.sort == 'a-to-z' && props.filteredData.sort((a,b) => (a.name > b.name) ? 1 : -1)
+                || props.sort == 'z-to-a' && props.filteredData.sort((a,b) => (a.name > b.name) ? -1 : 1))            
+              }
             />
               :
               <View style={styles.warningBox}>
-                <Text>Nothing found!</Text>
+                <Text style={styles.warningText}>Nothing found!</Text>
               </View>
         }
       </View>
-    </SafeAreaView>
   );
 };
 
@@ -72,15 +83,21 @@ const styles = StyleSheet.create({
   list__container: {
     margin: 0,
     width: "100%",
+    height: "100%",
     flex: 1
   },
-
+  flatListContainer:{
+    height: '90%',
+    flex: 1
+  },
   warningBox: {
     padding: 10, 
-    display: 'flex', 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    backgroundColor: globalStyles.backgroundtypenormal, 
+    backgroundColor: globalStyles.typepsychic, 
     borderRadius: 10
+  },
+
+  warningText: {
+    fontSize: 16,
+    color: globalStyles.textwhite
   }
 });
