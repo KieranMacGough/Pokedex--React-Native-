@@ -1,4 +1,5 @@
 // import { StatusBar } from 'expo-status-bar';
+// eas build -p android --profile preview
 import React, { useEffect, useState } from 'react';;
 import { StatusBar, View, StyleSheet, SafeAreaView } from 'react-native';
 import globalStyles from './styles/globalStyles.js';
@@ -92,11 +93,11 @@ useEffect(() => {
   return (
     
     <GestureHandlerRootView style={{ flex: 1 }}>
-      {/* <StatusBar
+      <StatusBar
   barStyle="light-content"
   translucent
   backgroundColor="#00000060"
-/> */}
+/>
       <View style={styles.container}>
         {(pokemonProfile === '')
           ? (<Home
@@ -130,7 +131,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'flex-start',
- //   paddingTop: StatusBar.currentHeight,
+    paddingTop: StatusBar.currentHeight,
     fontFamily: 'serif'
   }
 })

@@ -32,8 +32,8 @@ const Home = (props) => {
                     (item.id >= 1 && item.id <= 151 && props.generationFilters[0]
                         || item.id >= 152 && item.id <= 251 && props.generationFilters[1]
                         || item.id >= 252 && item.id <= 386 && props.generationFilters[2]
-                        || item.id >= 387 && item.id <= 493 && props.generationFilters[3]
-                        || item.id >= 494 && item.id <= 649 && props.generationFilters[4]
+                        || item.id >= 387 && item.id <= 494 && props.generationFilters[3]
+                        || item.id >= 495 && item.id <= 649 && props.generationFilters[4]
                         || item.id >= 650 && item.id <= 721 && props.generationFilters[5]
                         || item.id >= 722 && item.id <= 809 && props.generationFilters[6]
                         || item.id >= 810 && item.id <= 905 && props.generationFilters[7]
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
 
     pokeballTop: {
         position: 'absolute',
-        // top: StatusBar.currentHeight,
+      //  top: StatusBar.currentHeight,
         left: 0,
         width: Dimensions.get('window').width,
       //  height: Math.round(Dimensions.get('window').width) * (207 / 414),
