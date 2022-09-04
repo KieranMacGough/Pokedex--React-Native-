@@ -7,7 +7,8 @@ import {
   View,
   FlatList,
   SafeAreaView,
-  Text
+  Text,
+  Dimensions
 } from "react-native";
 
 
@@ -56,7 +57,7 @@ const List = (props) => {
               renderItem={renderItem}
               keyExtractor={keyExtractor}
               getItemLayout={getItemLayout}
-              style={{ paddingBottom: 560 }}
+              style={{ paddingBottom: (Dimensions.get('window').height-globalStyles.LIST_HEIGHT_NEGATIVE) }}
               initialNumToRender={20}
               maxToRenderPerBatch={20}
               removeClippedSubviews={true}
@@ -87,7 +88,7 @@ const styles = StyleSheet.create({
     flex: 1
   },
   flatListContainer:{
-    height: '90%',
+    height: '100%',
     flex: 1
   },
   warningBox: {

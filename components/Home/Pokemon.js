@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {memo} from 'react';
 import { StyleSheet, View, Image, Text, TouchableOpacity } from "react-native";
 import globalStyles from '../../styles/globalStyles.js';
 import TypeBadge from './TypeBadge';
@@ -6,7 +6,7 @@ import Pokeball from '../../images/vectors/patterns/Pokeball.png';
 import DotsSixByThree from '../../images/vectors/patterns/6x3.png';
 import FastImage from 'react-native-fast-image';
 
-export default function Pokemon(props) {
+function Pokemon(props) {
   function formatId(id) {
     var num = '' + id;
     while (num.length < 3) {
@@ -42,6 +42,8 @@ export default function Pokemon(props) {
     </TouchableOpacity>
   )
 }
+
+export default memo(Pokemon);
 
 const styles = StyleSheet.create({
   container: {

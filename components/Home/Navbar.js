@@ -31,23 +31,23 @@ const styles = StyleSheet.create({
     marginTop: 2.5,
     marginRight: 2.5,
     marginBottom: 37.5,
-    height: 30,
+    height: 45,
   },
       
       navGeneration: {
-        height: 25,
-        width: 25,
+        height: 35,
+        width: 35,
         marginRight: 20,
       },
       
       navSort: {
-        height: 25,
-        width: 25,
+        height: 35,
+        width: 35,
         marginRight: 20,
       },
       
       navFilter: {
-        height: 25,
-        width: 25,
+        height: 35,
+        width: 35,
       },
 })

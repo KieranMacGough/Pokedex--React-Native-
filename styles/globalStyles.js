@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 export default {
+    LIST_HEIGHT_NEGATIVE: 300,
     MAX_POKEMON_NUMBER: 905,
     typebug: '#8CB230',
     typedark: '#58575F',

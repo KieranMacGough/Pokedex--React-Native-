@@ -92,6 +92,27 @@ const defencesData = {
         fairy: 0,
 
     },
+    electric:
+    {
+        normal: 0,
+        fire: 0,
+        water: 0,
+        electric: -1,
+        grass: 0,
+        ice: 0,
+        fighting: 0,
+        poison: 0,
+        ground: 1,
+        flying: -1,
+        psychic: 0,
+        bug: 0,
+        rock: 0,
+        ghost: 0,
+        dragon: 0,
+        dark: 0,
+        steel: -1,
+        fairy: 0
+    },
     grass:
     {
         normal: 0,

@@ -51,7 +51,7 @@ const DataLine = (props) => {
     <View style={styles.boxAbout}>
       <Text style={styles.boxAboutTag}>{props.tag}</Text>
       {props.tag == 'Weaknesses' ?
-        weakness()
+       weakness()
         : props.tag == 'Gender' ?
           genderRate()
           : <Text style={styles.boxAboutData}>{props.data}</Text>
@@ -78,7 +78,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
     color: globalStyles.textblack,
-    minWidth: 110
+    minWidth: 120,
+    maxWidth: 125,
+    flex: 1,
+    flexWrap: 'wrap'
   },
 
   boxAboutDataContainer: {
@@ -89,6 +92,8 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: globalStyles.textgrey,
     textTransform: 'capitalize',
+    flex: 1,
+    flexWrap: 'wrap'
   },
 
   genderContainer: {

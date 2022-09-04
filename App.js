@@ -92,6 +92,11 @@ useEffect(() => {
   return (
     
     <GestureHandlerRootView style={{ flex: 1 }}>
+      {/* <StatusBar
+  barStyle="light-content"
+  translucent
+  backgroundColor="#00000060"
+/> */}
       <View style={styles.container}>
         {(pokemonProfile === '')
           ? (<Home
@@ -125,7 +130,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingTop: StatusBar.currentHeight,
+ //   paddingTop: StatusBar.currentHeight,
     fontFamily: 'serif'
   }
 })

@@ -100,8 +100,8 @@ const styles = StyleSheet.create({
     },
     tile: {
         flex: 1,
-        minWidth: 167,
-        maxWidth: 167,
+        minWidth: 120,
+        maxWidth: 170,
         height: 136,
         justifyContent: "center",
         alignItems: "center",

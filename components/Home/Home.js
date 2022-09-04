@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
 
     pokeballTop: {
         position: 'absolute',
-        top: StatusBar.currentHeight,
+        // top: StatusBar.currentHeight,
         left: 0,
         width: Dimensions.get('window').width,
       //  height: Math.round(Dimensions.get('window').width) * (207 / 414),
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
 
     bottomSheetContainer: {
         flex: 1,
-        padding: 24,
+     //   padding: 24,
         backgroundColor: globalStyles.backgroundwhite,
     },
 

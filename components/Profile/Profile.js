@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { TouchableOpacity, ScrollView, Dimensions, StatusBar, Image, View, Text, StyleSheet } from 'react-native';
+import React, { useState, useEffect, version } from 'react';
+import { TouchableOpacity, ScrollView, Dimensions, StatusBar, Image, View, Text, StyleSheet, BackHandler } from 'react-native';
 import TypeBadge from '../Home/TypeBadge';
 import globalStyles from '../../styles/globalStyles.js';
 import GradientNameText from '../GradientNameText';
@@ -32,6 +32,7 @@ const Profile = (props) => {
   const [evYield, setEvYield] = useState(defaultPhrase);
   const [evolutionChainId, setEvolutionChainId] = useState();
   const [evolutionChainData, setEvolutionChainData] = useState();
+  const [locations, setLocations] = useState();
   const [types, setTypes] = useState([]);
 
   function cmToFtInches(num) {
@@ -41,6 +42,18 @@ const Profile = (props) => {
     inches = inches.toString().padStart(2, '0');
     return feet + "\'" + inches + "\""
   }
+
+  const backAction = () => {
+      props.setPokemonProfile('') 
+    return true
+  };
+
+  useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", backAction);
+
+    return () =>
+      BackHandler.removeEventListener("hardwareBackPress", backAction);
+  }, []);
 
   useEffect(() => {
     const getPokemonSpeciesData = async () => {
@@ -55,7 +68,6 @@ const Profile = (props) => {
           setCatchRate(data.capture_rate);
           setGender(data.gender_rate);
           setEggCycles(data.hatch_counter + ' (' + (data.hatch_counter * 255).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' - ' + (data.hatch_counter * 257).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' steps)');
-
           for (let i = 0; i < data.genera.length; i++) {
             if (data.genera[i].language.name === 'en') {
               setSpecies(data.genera[i].genus);
@@ -96,13 +108,43 @@ const Profile = (props) => {
           // Get Evolution Data
           const urlPath = data.evolution_chain.url;
           setEvolutionChainId(urlPath.substring(urlPath.indexOf('chain/') + 6).slice(0, -1));
+        }
+      );
+      let locArr = [];
+      await api.pokemon
+        .getPokemonLocationAreaById(props.mon.id)
+        .then((data) => {
+          let tempLocations = data.map(locs => {
+            let games = [];
+            for (let x of locs.version_details) {
+              // Remove '-' from games, and capitalise
+              games.push(x.version.name.replace(/-/g, ' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()));
+            };
+          
+            let loc = {
+              // Remove '-' from names, and capitalise
+              "locationName": locs.location_area.name.replace(/-/g, ' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
+              "games": games
+            }
+            locArr.push(loc);
+          })
+          
+        }
+        );
 
-        })
+      setLocations(locArr);
       setLoading(false);
     }
     getPokemonSpeciesData();
-
   }, []);
+
+  const LocationComponent = ({locArr}) => (
+    <>
+      {locArr.map(loc => (
+        <DataLine tag={loc.locationName} data={loc.games.join(", ")} />
+      ))}
+    </>
+  )
 
   useEffect(() => {
     const getEvolutionChainData = async () => {
@@ -206,7 +248,8 @@ const Profile = (props) => {
               <DataLine tag={"Egg Groups"} data={eggGroups} />
               <DataLine tag={"Egg Cycles"} data={eggCycles} />
 
-              <Text style={[styles.boxTitle, { color: globalStyles["type" + type] }]}>Location</Text>
+              <Text style={[styles.boxTitle, { color: globalStyles["type" + type] }]}>Locations</Text>
+              <LocationComponent locArr={locations} />
             </View>}
           {tab == "Stats" &&
             <View style={styles.boxContent}>
