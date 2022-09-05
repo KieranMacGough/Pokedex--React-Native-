@@ -1,13 +1,19 @@
 // import { StatusBar } from 'expo-status-bar';
 // eas build -p android --profile preview
-import React, { useEffect, useState } from 'react';;
-import { StatusBar, View, StyleSheet, SafeAreaView } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';;
+import { StatusBar, Text, View, StyleSheet, SafeAreaView } from 'react-native';
 import globalStyles from './styles/globalStyles.js';
 import Home from './components/Home/Home.js';
 import Profile from './components/Profile/Profile.js';
 import { useFonts } from 'expo-font';
 import { MainClient } from 'pokenode-ts';
 import { GestureHandlerRootView, gestureHandlerRootHOC } from 'react-native-gesture-handler';
+import Entypo from '@expo/vector-icons/Entypo';
+import * as SplashScreen from 'expo-splash-screen';
+import * as Font from 'expo-font';
+
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
   const [allPokemonData, setAllPokemonData] = useState([]);
@@ -47,25 +53,14 @@ export default function App() {
     'normal': false,
     'heavy': false,
   });
-  const [rangeFilter, setRangeFilter] = useState([1, globalStyles.MAX_POKEMON_NUMBER])
+  const [rangeFilter, setRangeFilter] = useState([1, globalStyles.MAX_POKEMON_NUMBER]);
+  const [appIsReady, setAppIsReady] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const [loaded] = useFonts({
-    Inter: require('./fonts/Inter.ttf'),
-  });
 
-  async function pokePromises() {
-    const api = new MainClient();
-    let promises = [];
-    for (let i = 1; i <= globalStyles.MAX_POKEMON_NUMBER; i++) {
-      promises.push(api.pokemon.getPokemonById(i));
-    }
-    return Promise.all(promises);
-  }
-  const [loading, setLoading] = useState(true)
-
-useEffect(() => {
-  console.log("typeFilters",typeFilters);
-}, [typeFilters])
+  useEffect(() => {
+    console.log("typeFilters", typeFilters);
+  }, [typeFilters])
 
 
   // get data from the api endpoint
@@ -80,25 +75,65 @@ useEffect(() => {
     }
   }, []);
 
+
   useEffect(() => {
-    console.log("pokemonLoaded: ", pokemonLoaded);;
+
+    async function prepare() {
+      try {
+        // Pre-load fonts, make any API calls you need to do here
+        await Font.loadAsync(Entypo.font);
+        // Artificially delay for two seconds to simulate a slow loading
+        // experience. Please remove this if you copy and paste the code!
+        pokePromises().then(results => {
+          setAllPokemonData(results);
+          setLoading(false);
+        })
+        // await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        // Tell the application to render
+        setPokemonLoaded(true);
+      }
+    }
+
+    prepare();
+  }, []);
+
+  const onLayoutRootView = useCallback(async () => {
+    if (pokemonLoaded) {
+      // This tells the splash screen to hide immediately! If we call this after
+      // `setAppIsReady`, then we may see a blank screen while the app is
+      // loading its initial state and rendering its first pixels. So instead,
+      // we hide the splash screen once we know the root view has already
+      // performed layout.
+      await SplashScreen.hideAsync();
+    }
   }, [pokemonLoaded]);
 
-  // if (!loaded) {
-  //   return null;
-  // }
+  if (!pokemonLoaded) {
+    return null;
+  }
 
+  async function pokePromises() {
+    const api = new MainClient();
+    let promises = [];
+    for (let i = 1; i <= globalStyles.MAX_POKEMON_NUMBER; i++) {
+      promises.push(api.pokemon.getPokemonById(i));
+    }
+    return Promise.all(promises);
+  }
 
 
   return (
-    
     <GestureHandlerRootView style={{ flex: 1 }}>
       <StatusBar
-  barStyle="light-content"
-  translucent
-  backgroundColor="#00000060"
-/>
-      <View style={styles.container}>
+        barStyle="light-content"
+        translucent
+        backgroundColor="#00000060"
+      />
+      <View style={styles.container}
+        onLayout={onLayoutRootView}>
         {(pokemonProfile === '')
           ? (<Home
             searchPhrase={searchPhrase}
@@ -118,7 +153,6 @@ useEffect(() => {
             setWeightFilters={setWeightFilters}
             rangeFilter={rangeFilter}
             setRangeFilter={setRangeFilter}
-
           />)
           : (<Profile setPokemonProfile={setPokemonProfile} mon={pokemonProfile} />)}
       </View>

@@ -44,7 +44,7 @@ const Profile = (props) => {
   }
 
   const backAction = () => {
-      props.setPokemonProfile('') 
+    props.setPokemonProfile('')
     return true
   };
 
@@ -109,7 +109,7 @@ const Profile = (props) => {
           const urlPath = data.evolution_chain.url;
           setEvolutionChainId(urlPath.substring(urlPath.indexOf('chain/') + 6).slice(0, -1));
         }
-      );
+        );
       let locArr = [];
       await api.pokemon
         .getPokemonLocationAreaById(props.mon.id)
@@ -120,7 +120,7 @@ const Profile = (props) => {
               // Remove '-' from games, and capitalise
               games.push(x.version.name.replace(/-/g, ' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()));
             };
-          
+
             let loc = {
               // Remove '-' from names, and capitalise
               "locationName": locs.location_area.name.replace(/-/g, ' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
@@ -128,7 +128,7 @@ const Profile = (props) => {
             }
             locArr.push(loc);
           })
-          
+
         }
         );
 
@@ -138,11 +138,14 @@ const Profile = (props) => {
     getPokemonSpeciesData();
   }, []);
 
-  const LocationComponent = ({locArr}) => (
+  const LocationComponent = ({ locArr }) => (
     <>
-      {locArr.map(loc => (
-        <DataLine tag={loc.locationName} data={loc.games.join(", ")} />
-      ))}
+      {locArr.length > 0
+        ? locArr.map(loc => (
+          <DataLine key={loc.locationName} tag={loc.locationName} data={loc.games.join(", ")} />
+        ))
+        : <Text>No locations found.</Text>
+      }
     </>
   )
 

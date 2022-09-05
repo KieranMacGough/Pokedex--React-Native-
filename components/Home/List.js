@@ -44,12 +44,12 @@ const List = (props) => {
         }}
       >
         {
-          props.loading ?
-          <View style={styles.warningBox}>
-            <Text style={styles.warningText}>Loading...</Text>
-          </View>
-            :
-            props.filteredData && props.filteredData.length > 0 ? 
+          // props.loading ?
+          // <View style={styles.warningBox}>
+          //   <Text style={styles.warningText}>Loading...</Text>
+          // </View>
+          //   :
+            props.filteredData && props.filteredData.length > 0 ?
             <FlatList
               ref={props.pokemonListRef}
               horizontal={false}
@@ -69,10 +69,12 @@ const List = (props) => {
                 || props.sort == 'z-to-a' && props.filteredData.sort((a,b) => (a.name > b.name) ? -1 : 1))            
               }
             />
-              :
+              : 
+              <>
               <View style={styles.warningBox}>
                 <Text style={styles.warningText}>Nothing found!</Text>
               </View>
+              </>
         }
       </View>
   );
@@ -92,9 +94,10 @@ const styles = StyleSheet.create({
     flex: 1
   },
   warningBox: {
-    padding: 10, 
-    backgroundColor: globalStyles.typepsychic, 
-    borderRadius: 10
+    padding: 20, 
+    backgroundColor: globalStyles.typenormal, 
+    borderRadius: 10,
+    height: 24
   },
 
   warningText: {
